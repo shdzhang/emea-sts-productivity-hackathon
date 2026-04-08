@@ -98,6 +98,89 @@ graph TD
 
 ---
 
+## Improvements Over Original Code
+
+Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.2](https://github.com/databricks-field-eng/vibe/tree/main/plugins/fe-sts).
+
+### Idea 1: ASQ Auto-Triage — `asq-triage` (Shidong Zhang) ✅
+
+**Before:** No triage skill existed. Triage was entirely manual — the manager opened each new ASQ, checked UC stages in SFDC, verified consumption in Logfood, judged scope from the description, looked up the competency matrix spreadsheet, checked team workload, and posted Chatter comments one by one.
+
+**After:** Brand-new 210-line SKILL.md with 8 automated phases and 5 reference docs:
+
+| Capability | Before (manual) | After (asq-triage) |
+|-----------|-----------------|---------------------|
+| UC stage validation | Open each ASQ, navigate to UCO junction object, check stage manually | Batch SOQL query on `Approved_UseCase__c`, auto-apply U3+/U4+ rules |
+| Consumption check | Log into Logfood/Genie, look up account, compare against threshold | Automated query with $1K threshold, LA-to-Core conversion detection |
+| Scope scoring | Read description, make subjective judgment | LLM scores 1-10 using rubric in `triage-rules.md`, checks against cached service scope |
+| Team assignment | Open competency matrix spreadsheet, check each person's workload in SFDC | 3-factor formula (skills 50% + workload 30% + experience 20%) from `competency-matrix.md` |
+| Chatter comments | Copy/paste templates, manually tag users with SFDC IDs | 7 templates in `comment-templates.md`, auto-populated with ASQ-specific data |
+| Under Review follow-up | Remember to go back and check stale ASQs | Phase 1b: batch query + 5-step re-triage process |
+| Batch processing | One ASQ at a time | All new ASQs triaged together, grouped by action type for review |
+
+**New files:** `SKILL.md`, `references/triage-rules.md`, `references/competency-matrix.md`, `references/comment-templates.md`, `references/sfdc-schema.md`, `references/cache-setup.md` (6 files, ~750 lines total)
+
+---
+
+### Idea 2: Enhanced Meeting Prep — `asq-refresher` (Nadja Bulajic) ✅
+
+**Before (73 lines):** 4-step sequential workflow — gather from SFDC/Calendar/Gmail/Obsidian, fetch Slack history, fetch STS content, format a basic brief with raw field dumps.
+
+**After (199 lines + 121-line template):** 5-step parallel enrichment workflow with LLM synthesis.
+
+| Capability | Before (v2.0.2) | After (hackathon) |
+|-----------|-----------------|-------------------|
+| Data sources | 5 (SFDC, Calendar, Gmail, Slack, Obsidian) | 9 (+ DBRA, Logfood, Genie, Glean) |
+| Enrichment model | Sequential — each step waits for the previous | Parallel — all 5 enrichment calls issued simultaneously |
+| Consumption data | None | Logfood 30-day spend by product + 30d vs prior 30d growth trend (gated to LA/GA ASQs only) |
+| Internal research | None | DBRA deep search: escalations, engineering blockers, internal discussions |
+| Genie metrics | None | Account consumption summary from STS Genie Space |
+| Output format | Raw field listing (ASQ Context, Action Items table) | LLM-synthesized executive brief with structured template |
+| Brief template | None — hardcoded format in SKILL.md | Dedicated `references/brief-template.md` with 7 sections |
+| New sections | — | Executive Summary, Meeting Timeline, Meeting Recap, Consumption Summary, Internal Context, Key Contacts |
+| Source attribution | None | Every fact tagged with `[SFDC]`, `[Slack]`, `[Logfood]`, `[DBRA]`, etc. |
+| Graceful degradation | "present what you have if a source errored" (1 line) | Each source fails independently with specific fallback messages |
+| Output routing | Terminal only | Terminal (default) + Google Doc + Slack (on request) |
+| Contradiction detection | None | Flags when sources disagree |
+
+**Changed files:** `SKILL.md` (73 → 199 lines), new `references/brief-template.md` (121 lines)
+
+---
+
+### Idea 3: Post-Meeting Actions — `asq-update` (TBD) ⏳
+
+**Before (119 lines):** 7-phase workflow — gather context, draft SFDC status note, check if CAST needed, draft Slack message, present for approval, apply updates, optional Obsidian sync.
+
+**Planned improvements:**
+- Customer follow-up emails via Gmail skill with templates by meeting type
+- LLM extraction of structured action items with owners and deadlines from raw meeting notes
+- Next-meeting scheduling via Google Calendar FreeBusy
+- UCO stage progression suggestions based on meeting outcomes
+
+---
+
+### Idea 4: Success Story Generator — `asq-close` (TBD) ⏳
+
+**Before (136 lines):** 7-phase workflow — prepare closing payload, gather context, consumption analysis via Genie, draft STAR close notes, Slack closing message, present for approval, apply updates.
+
+**Planned improvements:**
+- Story-worthiness scoring with 4-criterion rubric (max 10 points): Metric Relevance, Growth Magnitude, Temporal Correlation, Engagement Depth
+- Auto-prompt when score >= 7 to generate a success story
+- 3-paragraph narrative (Situation/Action/Result) with consumption charts as PNGs
+- Google Docs publishing to shared folder
+- Slack win announcement to team channel
+- Red flag detection to skip stories with flat/declining usage
+
+---
+
+### Idea 5: ASQ Orchestrator — `asq-orchestrator` (TBD) ⏳
+
+**Before:** No orchestrator existed. Each skill invoked independently by the user.
+
+**Planned:** Central coordinator that manages the full ASQ lifecycle, routing ASQs to the right skill based on their current state (new → triage, assigned → onboard, meeting upcoming → prep, meeting done → update, ready → close).
+
+---
+
 ## How AI Improves Productivity
 
 Each skill replaces manual, repetitive work with AI-driven automation:
