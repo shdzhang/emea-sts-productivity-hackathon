@@ -48,9 +48,10 @@ graph TD
         F2 --> F3["Publish to Docs + Slack"]
     end
 
-    G["SCHEDULING LAYER  ⏳ Planned"] -.->|"auto-triage every 2h"| B
-    G -.->|"daily meeting prep"| D
-    G -.->|"weekly digest"| E
+    G["ORCHESTRATOR  ⏳ Planned"] -.->|"manages"| B
+    G -.->|"manages"| D
+    G -.->|"manages"| E
+    G -.->|"manages"| F
 
     style B fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:3px
     style C fill:#1565c0,color:#fff,stroke:#0d47a1
@@ -71,7 +72,7 @@ graph TD
 | 2 | **Enhanced Meeting Prep** | Person 2 | `asq-refresher` | Planned | Upgrade refresher with DBRA deep research, Logfood consumption trends, and Genie Space metrics. Add LLM synthesis for executive-ready briefs. |
 | 3 | **Post-Meeting Actions** | Person 3 | `asq-update` | Planned | Extend with customer follow-up emails, structured action-item extraction, next-meeting scheduling, and UCO stage updates. |
 | 4 | **Success Story Generator** | Person 4 | `asq-close` | Planned | Hook into close flow: score story-worthiness (4-criterion rubric), auto-generate narrative with consumption charts, publish to Google Docs. |
-| 5 | **Scheduling + Weekly Digest** | Person 5 | `asq-digest` | Planned | launchd-based scheduling for all skills + weekly portfolio digest with health scores, risk alerts, and suggested actions. |
+| 5 | **ASQ Orchestrator** | Person 5 | `asq-orchestrator` | Planned | Central orchestrator that manages and coordinates all ASQ lifecycle skills end-to-end. |
 
 > **Note:** Only `asq-triage` (Idea 1) has been implemented so far. The other skills currently contain their original fe-sts v2.0.2 code and will be updated in-place once hackathon implementations are ready.
 
@@ -93,7 +94,7 @@ graph TD
 | `asq-refresher` | Enhanced with DBRA + Logfood + Genie parallel agents and LLM synthesis |
 | `asq-update` | Extended with follow-up emails, action-item extraction, meeting scheduling |
 | `asq-close` | Integrated success-story scoring and generation |
-| `asq-digest` | **Brand new** — weekly portfolio digest with scheduling infrastructure |
+| `asq-orchestrator` | **Brand new** — central orchestrator that coordinates all ASQ lifecycle skills |
 
 ---
 
@@ -107,7 +108,7 @@ Each skill replaces manual, repetitive work with AI-driven automation:
 | Open 5 tabs (SFDC, Slack, Calendar, Gmail, Obsidian), read through history, write notes | `asq-refresher` aggregates all sources in one call, synthesizes an executive brief | **15-20 min/meeting** |
 | Type meeting notes, copy to SFDC, rewrite for Slack, draft follow-up email, schedule next meeting | `asq-update` generates all artifacts from raw notes — SFDC, Slack, email, calendar | **10-15 min/meeting** |
 | Query consumption data, compare before/after, write STAR notes, decide if story-worthy | `asq-close` + success story auto-analyzes impact, generates narrative with charts | **30-45 min/close** |
-| Manually review each ASQ status, check for overdue items, compile portfolio view | `asq-digest` runs weekly, surfaces risks and suggests actions proactively | **30 min/week** |
+| Manually invoke each skill separately, track which ASQs need which action | `asq-orchestrator` coordinates the full lifecycle — routes ASQs to the right skill automatically | **30 min/week** |
 
 **Total estimated savings:** ~2-3 hours/week per STS engineer across the EMEA team.
 
@@ -142,7 +143,7 @@ fe-sts/
     ├── asq-update/          ← ENHANCE (Idea 3)
     ├── asq-close/           ← ENHANCE (Idea 4)
     ├── asq-local-cache/     (existing)
-    └── asq-digest/          ← NEW (Idea 5, planned)
+    └── asq-orchestrator/    ← NEW (Idea 5, planned)
 ```
 
 ---
