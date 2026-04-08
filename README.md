@@ -28,8 +28,8 @@ graph TD
 
     C --> D
 
-    subgraph D["3 - ENGAGEMENT LOOP  ⏳ Planned"]
-        D1["Meeting Prep"] --> D2["Customer Meeting"]
+    subgraph D["3 - ENGAGEMENT LOOP  (prep ✅ / actions ⏳)"]
+        D1["Meeting Prep ✅"] --> D2["Customer Meeting"]
         D2 --> D3["Post-Meeting Actions"]
         D3 -.-> D1
     end
@@ -69,12 +69,12 @@ graph TD
 | # | Idea | Owner | Skill | Status | Description |
 |---|------|-------|-------|--------|-------------|
 | 1 | **ASQ Auto-Triage** | Person 1 | `asq-triage` | **Done** | Automates the full triage decision tree: UC stage validation, consumption checks, LLM scope scoring, competency-matrix assignment. Reduces 10-15 min/ASQ to seconds. |
-| 2 | **Enhanced Meeting Prep** | Person 2 | `asq-refresher` | Planned | Upgrade refresher with DBRA deep research, Logfood consumption trends, and Genie Space metrics. Add LLM synthesis for executive-ready briefs. |
+| 2 | **Enhanced Meeting Prep** | Person 2 | `asq-refresher` | **Done** | Rewrites the refresher from a 4-step sequential flow to a 5-step parallel enrichment workflow with DBRA deep research, Logfood consumption metrics, Genie trends, and LLM synthesis into executive-ready briefs. ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
 | 3 | **Post-Meeting Actions** | Person 3 | `asq-update` | Planned | Extend with customer follow-up emails, structured action-item extraction, next-meeting scheduling, and UCO stage updates. |
 | 4 | **Success Story Generator** | Person 4 | `asq-close` | Planned | Hook into close flow: score story-worthiness (4-criterion rubric), auto-generate narrative with consumption charts, publish to Google Docs. |
 | 5 | **ASQ Orchestrator** | Person 5 | `asq-orchestrator` | Planned | Central orchestrator that manages and coordinates all ASQ lifecycle skills end-to-end. |
 
-> **Note:** Only `asq-triage` (Idea 1) has been implemented so far. The other skills currently contain their original fe-sts v2.0.2 code and will be updated in-place once hackathon implementations are ready.
+> **Note:** `asq-triage` (Idea 1) and `asq-refresher` (Idea 2) have been implemented. The other skills currently contain their original fe-sts v2.0.2 code and will be updated in-place once hackathon implementations are ready.
 
 ### What Already Existed (fe-sts v2.0.2)
 
@@ -91,7 +91,7 @@ graph TD
 | Skill | What's New |
 |-------|-----------|
 | `asq-triage` | **Brand new** — full triage automation with 8-phase workflow, 5 reference docs, LLM scope scoring, competency-matrix assignment |
-| `asq-refresher` | Enhanced with DBRA + Logfood + Genie parallel agents and LLM synthesis |
+| `asq-refresher` | **Done** — rewritten with parallel DBRA + Logfood + Genie enrichment, LLM synthesis, brief template, graceful degradation ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
 | `asq-update` | Extended with follow-up emails, action-item extraction, meeting scheduling |
 | `asq-close` | Integrated success-story scoring and generation |
 | `asq-orchestrator` | **Brand new** — central orchestrator that coordinates all ASQ lifecycle skills |
