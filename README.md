@@ -1,6 +1,6 @@
 # EMEA STS Productivity Hackathon — Pillar 3
 
-Clone of [fe-sts](https://github.com/databricks-field-eng/vibe/tree/main/plugins/fe-sts) from the Vibe plugin marketplace.
+Clone of [fe-sts](https://github.com/databricks-field-eng/vibe/tree/main/plugins/fe-sts) from the Vibe plugin marketplace, plus [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) from the experimental plugin marketplace.
 
 **Goal:** Extend the fe-sts plugin to cover the complete STS engagement lifecycle — from triage to success story — with AI-driven automation at every step.
 
@@ -161,7 +161,7 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ### Idea 4: Success Story Generator — `success-story-generator` (Nada) ✅
 
-**Before:** No success story skill existed. Engineers manually decided if an ASQ was worth writing up, queried consumption data, wrote narratives from scratch, and created charts by hand.
+**Before:** The [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) plugin existed in the experimental marketplace but was disconnected from the main ASQ lifecycle. Engineers had to manually invoke it separately and decide which ASQs were story-worthy.
 
 **After:** Brand-new 350-line SKILL.md with 5-phase workflow, 3 reference docs, and a chart generation script (772 lines total):
 
@@ -239,6 +239,6 @@ fe-sts/
 
 ## Source
 
-Cloned from [databricks-field-eng/vibe/plugins/fe-sts](https://github.com/databricks-field-eng/vibe/tree/main/plugins/fe-sts).
-
-Hackathon planning doc: [STS EMEA - April FY26 Hackathon Pillar 3](https://docs.google.com/document/d/1hJRumsQso60yzBb39zToUTB6x4on8iS_4aLkPimgWrc/edit?tab=t.0).
+- fe-sts plugin: [databricks-field-eng/vibe/plugins/fe-sts](https://github.com/databricks-field-eng/vibe/tree/main/plugins/fe-sts)
+- success-story-generator: [databricks-eng/plugin-marketplace/.../sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories)
+- Hackathon planning doc: [STS EMEA - April FY26 Hackathon Pillar 3](https://docs.google.com/document/d/1hJRumsQso60yzBb39zToUTB6x4on8iS_4aLkPimgWrc/edit?tab=t.0)
