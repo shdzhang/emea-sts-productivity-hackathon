@@ -11,66 +11,54 @@ Clone of [fe-sts](https://github.com/databricks-field-eng/vibe/tree/main/plugins
 ## ASQ Lifecycle — AI Automation Map
 
 ```mermaid
-flowchart LR
-    subgraph TRIAGE["Phase 1: Triage"]
-        T1[New ASQ arrives]
-        T2[Validate UC Stage]
-        T3[Check Consumption]
-        T4[Score Scope via LLM]
-        T5[Auto-Assign via\nCompetency Matrix]
-        T1 --> T2 --> T3 --> T4 --> T5
+graph TD
+    A["<b>New ASQ Arrives</b>"] --> B
+
+    subgraph B["1 - TRIAGE  ✅ Done"]
+        B1["Validate UC Stage"] --> B2["Check Consumption"]
+        B2 --> B3["LLM Scope Scoring"]
+        B3 --> B4["Auto-Assign"]
     end
 
-    subgraph ONBOARD["Phase 2: Onboarding"]
-        O1[Create Slack Channel]
-        O2[Invite AT + Post Intro]
-        O3[Update SFDC + Cache]
-        O1 --> O2 --> O3
+    B --> C
+
+    subgraph C["2 - ONBOARDING  (existing)"]
+        C1["Create Slack Channel → Invite AT → Update SFDC"]
     end
 
-    subgraph ENGAGE["Phase 3: Engagement Loop"]
-        direction TB
-        E1[Meeting Prep\n+ DBRA Research]
-        E2[Customer Meeting]
-        E3[Post-Meeting Actions\nSFDC + Slack + Email]
-        E1 --> E2 --> E3
-        E3 -.->|next meeting| E1
+    C --> D
+
+    subgraph D["3 - ENGAGEMENT LOOP  ⏳ Planned"]
+        D1["Meeting Prep"] --> D2["Customer Meeting"]
+        D2 --> D3["Post-Meeting Actions"]
+        D3 -.-> D1
     end
 
-    subgraph CLOSE["Phase 4: Close"]
-        C1[Consumption Analysis\nvia Genie Room]
-        C2[Generate Close Notes\nSTAR format]
-        C3[Update SFDC + Slack]
-        C1 --> C2 --> C3
+    D --> E
+
+    subgraph E["4 - CLOSE  ⏳ Planned"]
+        E1["Consumption Analysis"] --> E2["STAR Close Notes"]
+        E2 --> E3["Update SFDC + Slack"]
     end
 
-    subgraph STORY["Phase 5: Success Story"]
-        S1[Score Story-Worthiness]
-        S2[Generate Narrative\n+ Charts]
-        S3[Publish to\nGoogle Docs + Slack]
-        S1 --> S2 --> S3
+    E --> F
+
+    subgraph F["5 - SUCCESS STORY  ⏳ Planned"]
+        F1["Score Worthiness"] --> F2["Generate Narrative + Charts"]
+        F2 --> F3["Publish to Docs + Slack"]
     end
 
-    subgraph SCHED["Scheduling Layer"]
-        SC1[Weekly Digest]
-        SC2[Auto-Triage every 2h]
-        SC3[Daily Meeting Prep]
-    end
+    G["SCHEDULING LAYER  ⏳ Planned"] -.->|"auto-triage every 2h"| B
+    G -.->|"daily meeting prep"| D
+    G -.->|"weekly digest"| E
 
-    T5 ==> O1
-    O3 ==> E1
-    E3 ==> C1
-    C3 ==> S1
-    SCHED -.->|automates| TRIAGE
-    SCHED -.->|automates| ENGAGE
-    SCHED -.->|automates| CLOSE
-
-    style TRIAGE fill:#2e7d32,color:#fff,stroke:#1b5e20
-    style ONBOARD fill:#1565c0,color:#fff,stroke:#0d47a1
-    style ENGAGE fill:#6a1b9a,color:#fff,stroke:#4a148c
-    style CLOSE fill:#e65100,color:#fff,stroke:#bf360c
-    style STORY fill:#c62828,color:#fff,stroke:#b71c1c
-    style SCHED fill:#37474f,color:#fff,stroke:#263238
+    style B fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:3px
+    style C fill:#1565c0,color:#fff,stroke:#0d47a1
+    style D fill:#6a1b9a,color:#fff,stroke:#4a148c
+    style E fill:#e65100,color:#fff,stroke:#bf360c
+    style F fill:#c62828,color:#fff,stroke:#b71c1c
+    style G fill:#37474f,color:#fff,stroke:#263238
+    style A fill:#424242,color:#fff,stroke:#212121
 ```
 
 ---
