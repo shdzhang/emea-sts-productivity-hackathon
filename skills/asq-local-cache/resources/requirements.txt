@@ -1,0 +1,2 @@
+--index-url https://pypi-proxy.dev.databricks.com/simple/
+pyyaml==6.0.2 --hash=sha256:d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e

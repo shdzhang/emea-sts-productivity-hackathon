@@ -1,0 +1,14 @@
+{
+  "name": "fe-sts",
+  "version": "2.0.3",
+  "description": "Manage ASQ (Account Specialist Request) lifecycle — onboarding, updates, CASTs, meeting prep, and closing with consumption analysis. Local caching, configurable preferences, and Genie Room integration.",
+  "author": {
+    "name": "Carlos Dip, Jose Delgado",
+    "email": "carlos.dip@databricks.com"
+  },
+  "keywords": ["sts", "asq", "salesforce", "approval-request", "internal"],
+  "skills": [
+    "./skills/"
+  ],
+  "commands": "./commands/"
+}
