@@ -154,6 +154,11 @@ DEFAULT_PREFERENCES = {
     "obsidian.active_path": "ASQ/Active",
     "obsidian.archive_path": "ASQ/Archive",
     "obsidian.accounts_path": "Accounts",
+
+    # --- Google Drive Shared Locations ---
+    # Folder and file IDs for shared artifacts between skills
+    # Can be either folder IDs or full URLs
+    "gdrive.artifacts_folder": "/ASQ",  # Main artifacts folder ID
 }
 
 # Human-readable descriptions for each preference (for preferences-show)
