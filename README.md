@@ -99,11 +99,11 @@ This means every skill has full context without re-querying SFDC or Slack — an
 | 1 | **ASQ Auto-Triage** | Shidong Zhang | `asq-triage` | **Done** | Automates the full triage decision tree: UC stage validation, consumption checks, LLM scope scoring, competency-matrix assignment. Reduces 10-15 min/ASQ to seconds. |
 | 2 | **ASQ Intake** | Aleksandra Stanojevic | `asq-intake` | **Done** | Extracts ASQ data from Salesforce, classifies the engagement, and creates a shared Knowledge Base (Google Drive workspace with CONTEXT and STATUS docs). |
 | 4a | **Enhanced Meeting Prep** | Nadja Bulajic | `asq-refresher` | **Done** | Rewrites the refresher from a 4-step sequential flow to a 5-step parallel enrichment workflow with DBRA deep research, Logfood consumption metrics, Genie trends, and LLM synthesis into executive-ready briefs. ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
-| 4b | **Post-Meeting Actions** | TBD | `asq-update` | Planned | Extend with customer follow-up emails, structured action-item extraction, next-meeting scheduling, and UCO stage updates. |
+| 4b | **Post-Meeting Follow-up** | Gergelj Kis | `asq-followup` | **Done** | Replaces `asq-update` with 8-phase workflow: Gemini meeting notes ingestion, LLM action extraction, customer follow-up email drafts, CAST-formatted SFDC notes, calendar scheduling, Slack summaries, and service goals alignment assessment with 14 STS service definitions. ([PR #2](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/2)) |
 | 6 | **Success Story Generator** | Nada El Atlassi | `success-story-generator` | **Done** | Adapted from [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) with interactive menu, Gmail enrichment, `--period` time filtering, and Slack DM delivery. |
 | — | **ASQ Scheduler** | TBD | `asq-scheduler` | Planned | Scheduling infrastructure to automate skill invocation on a cadence (triage every 2h, daily meeting prep, weekly digest). |
 
-> **Phase numbers match the diagram above.** Phases 3 (Onboarding) and 5 (Close) already existed in fe-sts v2.0.2. Phases 1, 2, 4a, and 6 have been implemented in this hackathon.
+> **Phase numbers match the diagram above.** Phases 3 (Onboarding) and 5 (Close) already existed in fe-sts v2.0.2. Phases 1, 2, 4a, 4b, and 6 have been implemented in this hackathon.
 
 ### What Already Existed (fe-sts v2.0.2)
 
@@ -122,7 +122,7 @@ This means every skill has full context without re-querying SFDC or Slack — an
 | 1 | `asq-triage` | **Brand new** — full triage automation with 8-phase workflow, 5 reference docs, LLM scope scoring, competency-matrix assignment |
 | 2 | `asq-intake` | **Brand new** — SFDC extraction, engagement classification, Google Drive workspace creation with CONTEXT + STATUS docs |
 | 4a | `asq-refresher` | **Rewritten** — parallel DBRA + Logfood + Genie enrichment, LLM synthesis, brief template, graceful degradation ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
-| 4b | `asq-update` | Planned — follow-up emails, action-item extraction, meeting scheduling |
+| 4b | `asq-followup` | **Replaces `asq-update`** — Gemini notes ingestion, LLM action extraction, follow-up emails, CAST SFDC notes, calendar scheduling, Slack summaries, service goals alignment with 14 service definitions ([PR #2](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/2)) |
 | 6 | `success-story-generator` | **Adapted** from [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) with interactive menu, Gmail enrichment, time period filtering, Slack DM delivery |
 | — | `asq-scheduler` | Planned — scheduling infrastructure for automated skill invocation |
 
@@ -200,15 +200,25 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ---
 
-### Phase 4b — Post-Meeting Actions: `asq-update` (TBD) ⏳
+### Phase 4b — Post-Meeting Follow-up: `asq-followup` (Gergelj Kis) ✅
 
-**Before (119 lines):** 7-phase workflow — gather context, draft SFDC status note, check if CAST needed, draft Slack message, present for approval, apply updates, optional Obsidian sync.
+**Before (118 lines, 2 files):** `asq-update` had a 7-phase workflow — gather context via `asq_tools.py`, draft SFDC status note with user preferences, check if CAST needed, draft Slack message, present for approval, apply updates, optional Obsidian sync. No email drafting, no meeting notes parsing, no calendar scheduling, no service alignment.
 
-**Planned improvements:**
-- Customer follow-up emails via Gmail skill with templates by meeting type
-- LLM extraction of structured action items with owners and deadlines from raw meeting notes
-- Next-meeting scheduling via Google Calendar FreeBusy
-- UCO stage progression suggestions based on meeting outcomes
+**After (636 lines + 20 supporting files, ~2,900 lines total):** Completely replaced with `asq-followup` — an 8-phase workflow that starts from Gemini meeting notes and produces all post-meeting artifacts. ([PR #2](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/2))
+
+| Capability | Before (`asq-update` v2.0.2) | After (`asq-followup`) |
+|-----------|-------------------------------|------------------------|
+| Meeting notes input | User provides raw notes manually | **Gemini notes auto-retrieval** from Gmail or Meet recording URL, with multi-match selection and manual fallback (`references/gemini-notes-parser.md`) |
+| Action extraction | None — user writes action items | **LLM extraction** of action items (owner + task + due date), key decisions, open questions, blockers, UCO progression indicators (`references/meeting-parser.md`) |
+| Follow-up email | None | **Gmail draft** with professional template: thank-you, key decisions summary, action items table, next steps, proposed meeting slots (`resources/email-templates.md`) |
+| SFDC notes | Draft status note with user format preferences | **CAST-formatted YAML** status note with meeting type, attendees, outcomes, sentiment, UCO stage, and follow-up date (`references/cast-integration.md`) |
+| Calendar scheduling | None | **Smart scheduling**: extracts follow-up date from notes if mentioned, otherwise runs availability scan and proposes 3 time slots |
+| Slack summary | Draft message matching channel tone | **Structured Slack summary** with key decisions, action items, and next meeting info — only posts if channel is configured |
+| Service alignment | None | **Phase 8: Service Goals Alignment Assessment** — loads the STS service definition for the ASQ's support type, compares meeting activities against key activities and deliverables, calculates alignment score, and generates targeted recommendations for next meeting |
+| STS service catalog | None | **14 service definition files** across 4 pillars (Platform, Data Engineering, Data Warehousing, Migration, ML & GenAI) with key activities, deliverables, and success metrics (`references/sts-services/`) plus `resources/service_alignment.py` |
+| Invocation modes | Single entry: customer name/alias | **5 modes**: URL, ASQ ID, customer name, date search, manual input |
+
+**New files:** `SKILL.md` (636 lines), `references/cast-integration.md` (243 lines), `references/gemini-notes-parser.md` (492 lines), `references/meeting-parser.md` (395 lines), `references/sts-services/` (14 service READMEs + index, ~700 lines), `resources/email-templates.md` (226 lines), `resources/service_alignment.py` (215 lines) — 21 files, ~2,900 lines total
 
 ---
 
@@ -248,7 +258,7 @@ Each skill replaces manual, repetitive work with AI-driven automation:
 |---------------|---------------|------------|
 | Read ASQ description, check UC stage in SFDC, verify consumption, decide scope, find available team member, post Chatter comment | `asq-triage` runs all checks in parallel, scores with LLM, proposes assignment — human just approves | **10-15 min/ASQ** |
 | Open 5 tabs (SFDC, Slack, Calendar, Gmail, Obsidian), read through history, write notes | `asq-refresher` aggregates all sources in one call, synthesizes an executive brief | **15-20 min/meeting** |
-| Type meeting notes, copy to SFDC, rewrite for Slack, draft follow-up email, schedule next meeting | `asq-update` generates all artifacts from raw notes — SFDC, Slack, email, calendar | **10-15 min/meeting** |
+| Type meeting notes, copy to SFDC, rewrite for Slack, draft follow-up email, schedule next meeting | `asq-followup` ingests Gemini notes, extracts actions via LLM, drafts email + SFDC CAST + Slack + calendar event — human just reviews and approves | **15-20 min/meeting** |
 | Query consumption data, compare before/after, write STAR notes, decide if story-worthy | `asq-close` + success story auto-analyzes impact, generates narrative with charts | **30-45 min/close** |
 | Look up ASQ in SFDC, create Drive folders, write CONTEXT/STATUS docs from scratch | `asq-intake` extracts SFDC data, classifies engagement, creates full workspace in one command | **20-30 min/ASQ** |
 | Manually invoke each skill, remember the cadence | `asq-scheduler` automates skill invocation on a schedule (triage, prep, digest) | **30 min/week** |
@@ -284,7 +294,16 @@ fe-sts/
     ├── asq-intake/          ← NEW (Phase 2)
     ├── asq-onboarding/      (existing, Phase 3)
     ├── asq-refresher/       ← ENHANCED (Phase 4a)
-    ├── asq-update/          ← ENHANCE (Phase 4b, planned)
+    ├── asq-followup/        ← NEW, replaces asq-update (Phase 4b)
+    │   ├── SKILL.md
+    │   ├── references/
+    │   │   ├── cast-integration.md
+    │   │   ├── gemini-notes-parser.md
+    │   │   ├── meeting-parser.md
+    │   │   └── sts-services/    (14 service definitions)
+    │   └── resources/
+    │       ├── email-templates.md
+    │       └── service_alignment.py
     ├── asq-close/           (existing, Phase 5)
     ├── success-story-generator/ ← ADAPTED (Phase 6)
     ├── asq-local-cache/     (existing)
