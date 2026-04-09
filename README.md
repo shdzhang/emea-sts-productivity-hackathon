@@ -191,20 +191,21 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ### Idea 4: Success Story Generator — `success-story-generator` (Nada El Atlassi) ✅
 
-**Before:** The [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) plugin existed in the experimental marketplace but was disconnected from the main ASQ lifecycle. Engineers had to manually invoke it separately and decide which ASQs were story-worthy.
+**Before (245 lines):** The [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) plugin existed in the experimental marketplace with a 5-step workflow: resolve input, gather data in parallel, score & rank, generate output, and check existing stories. It supported Glean + Slack enrichment.
 
-**After:** Adapted and improved into a 350-line SKILL.md with 5-phase workflow, 3 reference docs, and a chart generation script (772 lines total):
+**After (349 lines):** Adapted with 104 new lines adding an interactive menu, new data sources, time period filtering, and Slack DM delivery. Reference files (`SCORING.md`, `METRIC_MAPPINGS.md`, `CHART_SPEC.md`) and `generate_chart.py` are unchanged.
 
-| Capability | Before (manual) | After (success-story-generator) |
-|-----------|-----------------|--------------------------------|
-| Story-worthiness evaluation | Subjective gut feel | 4-criterion scoring rubric (max 10 points): Metric Relevance, Growth Magnitude, Temporal Correlation, Engagement Depth (`SCORING.md`) |
-| Consumption data | Manually query Logfood/Genie | Automated queries against `gold_shared_asqrelativemetrics` with 30+ metric columns (`METRIC_MAPPINGS.md`) |
-| Narrative generation | Write from scratch | LLM-generated 3-paragraph blurb (Situation/Action/Result) from ASQ context |
-| Charts | Manual screenshot or no chart | `generate_chart.py` produces styled consumption PNGs per `CHART_SPEC.md` |
-| Output | Email or Slack paste | Google Docs with formatted narrative + embedded charts |
-| Red flag detection | None | Auto-skip if usage flat/declining, spike-only, or insufficient post-engagement data |
+| Capability | Original (marketplace) | Adapted (hackathon) |
+|-----------|----------------------|---------------------|
+| Invocation | Parse `--account`/`--asq`/`--engineer`/`--top` flags, run full pipeline | **New interactive menu** with 8 actions: generate Doc, Slides, draft Slack post, send Slack DM, get customer feedback, get win announcements, score & rank, or all |
+| Time filtering | None — queries all completed ASQs | **New `--period` flag** (default: 3m) — filter by `1m`–`12m`, `1y`–`5y`, or `all` with `DATE_ADD` WHERE clause |
+| Enrichment sources | Glean + Slack (generic win search) | **+ Gmail** for customer thank-you emails and internal feedback; **Slack upgraded** to two targeted searches: (1) win announcements mentioning the engineer by Slack user ID, (2) commit/deal announcements for the account |
+| Slack delivery | None | **New Step 6: Slack DM Win Summary** — formatted win message with growth %, blurb, and Google Doc link sent to engineer's DMs (opt-in with draft preview) |
+| Draft Slack post | None | **Menu option 3** — generates a formatted win announcement for a channel, shows draft before posting |
+| Customer feedback | None | **Menu option 5** — searches Gmail (`from:*@customer.com`, `subject:thank`) and Slack for direct customer appreciation quotes |
+| Win announcements | None | **Menu option 6** — finds Slack posts where AEs/SAs celebrated deals with STS contribution |
 
-**New files:** `SKILL.md`, `references/SCORING.md`, `references/METRIC_MAPPINGS.md`, `references/CHART_SPEC.md`, `scripts/generate_chart.py` (5 files, ~772 lines total)
+**Files changed:** `SKILL.md` (245 → 349 lines, +104 lines). References and scripts unchanged.
 
 ---
 
