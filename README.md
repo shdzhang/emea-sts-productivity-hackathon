@@ -12,7 +12,14 @@ Clone of [fe-sts](https://github.com/databricks-field-eng/vibe/tree/main/plugins
 
 ```mermaid
 graph TD
-    A["<b>New ASQ Arrives</b>"] --> B
+    A["<b>New ASQ Arrives</b>"] --> A1
+
+    subgraph A1["0 - INTAKE  ✅ Done"]
+        A1a["Extract SFDC Data"] --> A1b["Classify Engagement"]
+        A1b --> A1c["Create GDrive Workspace"]
+    end
+
+    A1 --> B
 
     subgraph B["1 - TRIAGE  ✅ Done"]
         B1["Validate UC Stage"] --> B2["Check Consumption"]
@@ -48,11 +55,11 @@ graph TD
         F2 --> F3["Publish to Docs + Slack"]
     end
 
-    G["ORCHESTRATOR  ⏳ Planned"] -.->|"manages"| B
-    G -.->|"manages"| D
-    G -.->|"manages"| E
-    G -.->|"manages"| F
+    G["SCHEDULER  ⏳ Planned"] -.->|"auto-triage"| B
+    G -.->|"daily prep"| D
+    G -.->|"weekly digest"| E
 
+    style A1 fill:#00695c,color:#fff,stroke:#004d40,stroke-width:3px
     style B fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:3px
     style C fill:#1565c0,color:#fff,stroke:#0d47a1
     style D fill:#6a1b9a,color:#fff,stroke:#4a148c
@@ -72,9 +79,10 @@ graph TD
 | 2 | **Enhanced Meeting Prep** | Nadja Bulajic | `asq-refresher` | **Done** | Rewrites the refresher from a 4-step sequential flow to a 5-step parallel enrichment workflow with DBRA deep research, Logfood consumption metrics, Genie trends, and LLM synthesis into executive-ready briefs. ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
 | 3 | **Post-Meeting Actions** | TBD | `asq-update` | Planned | Extend with customer follow-up emails, structured action-item extraction, next-meeting scheduling, and UCO stage updates. |
 | 4 | **Success Story Generator** | Nada | `success-story-generator` | **Done** | Brand-new skill for generating consumption-correlated success stories with 4-criterion scoring rubric, metric mappings, chart generation, and Google Docs publishing. |
-| 5 | **ASQ Orchestrator** | TBD | `asq-orchestrator` | Planned | Central orchestrator that manages and coordinates all ASQ lifecycle skills end-to-end. |
+| 5 | **ASQ Scheduler** | TBD | `asq-scheduler` | Planned | Scheduling infrastructure to automate skill invocation on a cadence (triage every 2h, daily meeting prep, weekly digest). |
+| 6 | **ASQ Intake** | TBD | `asq-intake` | **Done** | Extracts ASQ data from Salesforce, classifies the engagement, and creates a structured Google Drive workspace with CONTEXT and STATUS docs. |
 
-> **Note:** `asq-triage` (Idea 1), `asq-refresher` (Idea 2), and `success-story-generator` (Idea 4) have been implemented. The other skills currently contain their original fe-sts v2.0.2 code and will be updated in-place once hackathon implementations are ready.
+> **Note:** `asq-triage` (Idea 1), `asq-refresher` (Idea 2), `success-story-generator` (Idea 4), and `asq-intake` (Idea 6) have been implemented. The other skills currently contain their original fe-sts v2.0.2 code and will be updated in-place once hackathon implementations are ready.
 
 ### What Already Existed (fe-sts v2.0.2)
 
@@ -94,7 +102,8 @@ graph TD
 | `asq-refresher` | **Done** — rewritten with parallel DBRA + Logfood + Genie enrichment, LLM synthesis, brief template, graceful degradation ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
 | `asq-update` | Extended with follow-up emails, action-item extraction, meeting scheduling |
 | `success-story-generator` | **Done** — brand-new skill with 5-phase workflow, 4-criterion scoring rubric, metric mappings, chart generation script, and Google Docs output |
-| `asq-orchestrator` | **Brand new** — central orchestrator that coordinates all ASQ lifecycle skills |
+| `asq-scheduler` | **Brand new** — scheduling infrastructure for automated skill invocation |
+| `asq-intake` | **Done** — brand-new skill: SFDC extraction, engagement classification, Google Drive workspace creation with CONTEXT + STATUS docs |
 
 ---
 
@@ -178,11 +187,31 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ---
 
-### Idea 5: ASQ Orchestrator — `asq-orchestrator` (TBD) ⏳
+### Idea 5: ASQ Scheduler — `asq-scheduler` (TBD) ⏳
 
-**Before:** No orchestrator existed. Each skill invoked independently by the user.
+**Before:** No scheduling existed. Every skill had to be manually invoked by the user.
 
-**Planned:** Central coordinator that manages the full ASQ lifecycle, routing ASQs to the right skill based on their current state (new → triage, assigned → onboard, meeting upcoming → prep, meeting done → update, ready → close).
+**Planned:** launchd-based scheduling infrastructure to automate skill invocation on a cadence (triage every 2h during business hours, daily meeting prep at 8 AM, weekly portfolio digest on Mondays).
+
+---
+
+### Idea 6: ASQ Intake — `asq-intake` (TBD) ✅
+
+**Before:** No intake skill existed. Engineers manually looked up ASQ details in Salesforce, created Google Drive folders by hand, and wrote CONTEXT/STATUS docs from scratch.
+
+**After:** Brand-new 342-line SKILL.md with 6-phase workflow:
+
+| Capability | Before (manual) | After (asq-intake) |
+|-----------|-----------------|---------------------|
+| ASQ lookup | Navigate SFDC, find the ASQ record | Direct lookup by AR number or customer name search with multi-match selection |
+| Account data | Manually pull consumption, workspaces, contract info from account page | Automated extraction of DBU consumption (30d/60d), workspace list, consumption mode breakdown |
+| Engagement classification | Subjective assessment | LLM classifies pillar, service type, engagement format, and estimated complexity |
+| CAST framework | Write from scratch in a doc | Auto-populated from ASQ description with explicit "to be refined" markers for incomplete elements |
+| Google Drive workspace | Manually create folder, subfolders, docs | Auto-creates `AR-XXXXX_CustomerName/` with research/, sessions/, code/, comms/ subfolders |
+| CONTEXT + STATUS docs | Write from scratch | Templated Google Docs with ASQ details, CAST, account team, customer profile, classification |
+| Cross-agent references | None | Google Drive IDs recorded in CONTEXT doc so downstream agents can locate resources |
+
+**New files:** `SKILL.md` (342 lines)
 
 ---
 
@@ -196,7 +225,8 @@ Each skill replaces manual, repetitive work with AI-driven automation:
 | Open 5 tabs (SFDC, Slack, Calendar, Gmail, Obsidian), read through history, write notes | `asq-refresher` aggregates all sources in one call, synthesizes an executive brief | **15-20 min/meeting** |
 | Type meeting notes, copy to SFDC, rewrite for Slack, draft follow-up email, schedule next meeting | `asq-update` generates all artifacts from raw notes — SFDC, Slack, email, calendar | **10-15 min/meeting** |
 | Query consumption data, compare before/after, write STAR notes, decide if story-worthy | `asq-close` + success story auto-analyzes impact, generates narrative with charts | **30-45 min/close** |
-| Manually invoke each skill separately, track which ASQs need which action | `asq-orchestrator` coordinates the full lifecycle — routes ASQs to the right skill automatically | **30 min/week** |
+| Look up ASQ in SFDC, create Drive folders, write CONTEXT/STATUS docs from scratch | `asq-intake` extracts SFDC data, classifies engagement, creates full workspace in one command | **20-30 min/ASQ** |
+| Manually invoke each skill, remember the cadence | `asq-scheduler` automates skill invocation on a schedule (triage, prep, digest) | **30 min/week** |
 
 **Total estimated savings:** ~2-3 hours/week per STS engineer across the EMEA team.
 
@@ -232,7 +262,8 @@ fe-sts/
     ├── asq-close/           (existing)
     ├── success-story-generator/ ← NEW (Hackathon Idea 4)
     ├── asq-local-cache/     (existing)
-    └── asq-orchestrator/    ← NEW (Idea 5, planned)
+    ├── asq-intake/          ← NEW (Hackathon Idea 6)
+    └── asq-scheduler/       ← NEW (Idea 5, planned)
 ```
 
 ---
