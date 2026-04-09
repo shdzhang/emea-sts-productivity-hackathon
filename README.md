@@ -94,16 +94,16 @@ This means every skill has full context without re-querying SFDC or Slack — an
 
 ## Hackathon Deliverables
 
-| Phase | Idea | Owner | Skill | Status | Description |
-|-------|------|-------|-------|--------|-------------|
+| Phase | Deliverable | Owner | Skill | Status | Description |
+|-------|-------------|-------|-------|--------|-------------|
 | 1 | **ASQ Auto-Triage** | Shidong Zhang | `asq-triage` | **Done** | Automates the full triage decision tree: UC stage validation, consumption checks, LLM scope scoring, competency-matrix assignment. Reduces 10-15 min/ASQ to seconds. |
 | 2 | **ASQ Intake** | Aleksandra Stanojevic | `asq-intake` | **Done** | Extracts ASQ data from Salesforce, classifies the engagement, and creates a shared Knowledge Base (Google Drive workspace with CONTEXT and STATUS docs). |
-| 3 | **Enhanced Meeting Prep** | Nadja Bulajic | `asq-refresher` | **Done** | Rewrites the refresher from a 4-step sequential flow to a 5-step parallel enrichment workflow with DBRA deep research, Logfood consumption metrics, Genie trends, and LLM synthesis into executive-ready briefs. ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
-| 4 | **Post-Meeting Actions** | TBD | `asq-update` | Planned | Extend with customer follow-up emails, structured action-item extraction, next-meeting scheduling, and UCO stage updates. |
-| 5 | **Success Story Generator** | Nada El Atlassi | `success-story-generator` | **Done** | Adapted from [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) with improved scoring rubric, metric mappings, chart generation, and Google Docs publishing. |
+| 4a | **Enhanced Meeting Prep** | Nadja Bulajic | `asq-refresher` | **Done** | Rewrites the refresher from a 4-step sequential flow to a 5-step parallel enrichment workflow with DBRA deep research, Logfood consumption metrics, Genie trends, and LLM synthesis into executive-ready briefs. ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
+| 4b | **Post-Meeting Actions** | TBD | `asq-update` | Planned | Extend with customer follow-up emails, structured action-item extraction, next-meeting scheduling, and UCO stage updates. |
+| 6 | **Success Story Generator** | Nada El Atlassi | `success-story-generator` | **Done** | Adapted from [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) with interactive menu, Gmail enrichment, `--period` time filtering, and Slack DM delivery. |
 | — | **ASQ Scheduler** | TBD | `asq-scheduler` | Planned | Scheduling infrastructure to automate skill invocation on a cadence (triage every 2h, daily meeting prep, weekly digest). |
 
-> **Note:** `asq-triage` (Idea 1), `asq-refresher` (Idea 2), `success-story-generator` (Idea 4), and `asq-intake` (Idea 6) have been implemented. The other skills currently contain their original fe-sts v2.0.2 code and will be updated in-place once hackathon implementations are ready.
+> **Phase numbers match the diagram above.** Phases 3 (Onboarding) and 5 (Close) already existed in fe-sts v2.0.2. Phases 1, 2, 4a, and 6 have been implemented in this hackathon.
 
 ### What Already Existed (fe-sts v2.0.2)
 
@@ -117,14 +117,14 @@ This means every skill has full context without re-querying SFDC or Slack — an
 
 ### What This Hackathon Adds
 
-| Skill | What's New |
-|-------|-----------|
-| `asq-triage` | **Brand new** — full triage automation with 8-phase workflow, 5 reference docs, LLM scope scoring, competency-matrix assignment |
-| `asq-refresher` | **Done** — rewritten with parallel DBRA + Logfood + Genie enrichment, LLM synthesis, brief template, graceful degradation ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
-| `asq-update` | Extended with follow-up emails, action-item extraction, meeting scheduling |
-| `success-story-generator` | **Done** — adapted from [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) with improved scoring, metric mappings, chart generation, and Google Docs output |
-| `asq-scheduler` | **Brand new** — scheduling infrastructure for automated skill invocation |
-| `asq-intake` | **Done** — brand-new skill: SFDC extraction, engagement classification, Google Drive workspace creation with CONTEXT + STATUS docs |
+| Phase | Skill | What's New |
+|-------|-------|-----------|
+| 1 | `asq-triage` | **Brand new** — full triage automation with 8-phase workflow, 5 reference docs, LLM scope scoring, competency-matrix assignment |
+| 2 | `asq-intake` | **Brand new** — SFDC extraction, engagement classification, Google Drive workspace creation with CONTEXT + STATUS docs |
+| 4a | `asq-refresher` | **Rewritten** — parallel DBRA + Logfood + Genie enrichment, LLM synthesis, brief template, graceful degradation ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
+| 4b | `asq-update` | Planned — follow-up emails, action-item extraction, meeting scheduling |
+| 6 | `success-story-generator` | **Adapted** from [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) with interactive menu, Gmail enrichment, time period filtering, Slack DM delivery |
+| — | `asq-scheduler` | Planned — scheduling infrastructure for automated skill invocation |
 
 ---
 
@@ -132,7 +132,7 @@ This means every skill has full context without re-querying SFDC or Slack — an
 
 Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.2](https://github.com/databricks-field-eng/vibe/tree/main/plugins/fe-sts).
 
-### Idea 1: ASQ Auto-Triage — `asq-triage` (Shidong Zhang) ✅
+### Phase 1 — ASQ Auto-Triage: `asq-triage` (Shidong Zhang) ✅
 
 **Before:** No triage skill existed. Triage was entirely manual — the manager opened each new ASQ, checked UC stages in SFDC, verified consumption in Logfood, judged scope from the description, looked up the competency matrix spreadsheet, checked team workload, and posted Chatter comments one by one.
 
@@ -152,7 +152,30 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ---
 
-### Idea 2: Enhanced Meeting Prep — `asq-refresher` (Nadja Bulajic) ✅
+### Phase 2 — ASQ Intake: `asq-intake` (Aleksandra Stanojevic) ✅
+
+**Before:** No intake skill existed. Engineers manually looked up ASQ details in Salesforce, created Google Drive folders by hand, and wrote CONTEXT/STATUS docs from scratch. Each skill operated in isolation with no shared state.
+
+**After:** Brand-new 358-line SKILL.md with 6-phase workflow (plus Phase 1b) that introduces the **shared knowledge base** pattern — the most innovative part of the hackathon. Updated with production-ready SOQL queries, Google Docs MCP patterns, and SFDC relationship fixes:
+
+| Capability | Before (manual) | After (asq-intake) |
+|-----------|-----------------|---------------------|
+| ASQ lookup | Navigate SFDC, find the ASQ record | Direct lookup by AR number or customer name search with multi-match selection. Includes exact SOQL queries against `ApprovalRequest__c` with 14 fields |
+| Account team | Manually find AE and SA from the account page | **Separate Phase 1b** fetches account owner via `Account WHERE Id = ...` — avoids invalid `Last_SA_Engaged__r` relationship on `ApprovalRequest__c` |
+| Account data | Manually pull consumption, workspaces, contract info from account page | Automated extraction of DBU consumption (30d/60d), workspace list, consumption mode breakdown |
+| Engagement classification | Subjective assessment | LLM classifies pillar, service type, engagement format, and estimated complexity |
+| CAST framework | Write from scratch in a doc | Auto-populated from ASQ description with explicit "to be refined" markers for incomplete elements |
+| Google Drive workspace | Manually create folder, subfolders, docs | Auto-creates `AR-XXXXX_CustomerName/` with research/, sessions/, code/, comms/ subfolders using Google Drive MCP |
+| CONTEXT + STATUS docs | Write from scratch | Write markdown to temp file, create Google Doc via `mcp__google__docs_document_create_from_markdown`, then move into engagement folder. Two-pass creation: docs created first, then CONTEXT updated with actual doc IDs |
+| **Shared knowledge base** | **None — each skill queried SFDC independently** | **Google Drive IDs recorded in CONTEXT doc; all downstream skills read/write to this workspace, building cumulative context across the entire engagement lifecycle** |
+
+**Why this matters:** In the original fe-sts, every skill starts from scratch — querying SFDC, searching Slack, re-gathering the same context. With `asq-intake`, the CONTEXT doc becomes the single source of truth. Meeting prep reads it, post-meeting actions update it, close reads the full history. The knowledge base grows with every interaction, eliminating redundant queries and ensuring no context is lost between sessions.
+
+**New files:** `SKILL.md` (358 lines)
+
+---
+
+### Phase 4a — Enhanced Meeting Prep: `asq-refresher` (Nadja Bulajic) ✅
 
 **Before (73 lines):** 4-step sequential workflow — gather from SFDC/Calendar/Gmail/Obsidian, fetch Slack history, fetch STS content, format a basic brief with raw field dumps.
 
@@ -177,7 +200,7 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ---
 
-### Idea 3: Post-Meeting Actions — `asq-update` (TBD) ⏳
+### Phase 4b — Post-Meeting Actions: `asq-update` (TBD) ⏳
 
 **Before (119 lines):** 7-phase workflow — gather context, draft SFDC status note, check if CAST needed, draft Slack message, present for approval, apply updates, optional Obsidian sync.
 
@@ -189,7 +212,7 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ---
 
-### Idea 4: Success Story Generator — `success-story-generator` (Nada El Atlassi) ✅
+### Phase 6 — Success Story Generator: `success-story-generator` (Nada El Atlassi) ✅
 
 **Before (245 lines):** The [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) plugin existed in the experimental marketplace with a 5-step workflow: resolve input, gather data in parallel, score & rank, generate output, and check existing stories. It supported Glean + Slack enrichment.
 
@@ -209,33 +232,11 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ---
 
-### Idea 5: ASQ Scheduler — `asq-scheduler` (TBD) ⏳
+### Cross-cutting: ASQ Scheduler — `asq-scheduler` (TBD) ⏳
 
 **Before:** No scheduling existed. Every skill had to be manually invoked by the user.
 
 **Planned:** launchd-based scheduling infrastructure to automate skill invocation on a cadence (triage every 2h during business hours, daily meeting prep at 8 AM, weekly portfolio digest on Mondays).
-
----
-
-### Idea 6: ASQ Intake — `asq-intake` (Aleksandra Stanojevic) ✅
-
-**Before:** No intake skill existed. Engineers manually looked up ASQ details in Salesforce, created Google Drive folders by hand, and wrote CONTEXT/STATUS docs from scratch. Each skill operated in isolation with no shared state.
-
-**After:** Brand-new 342-line SKILL.md with 6-phase workflow that introduces the **shared knowledge base** pattern — the most innovative part of the hackathon:
-
-| Capability | Before (manual) | After (asq-intake) |
-|-----------|-----------------|---------------------|
-| ASQ lookup | Navigate SFDC, find the ASQ record | Direct lookup by AR number or customer name search with multi-match selection |
-| Account data | Manually pull consumption, workspaces, contract info from account page | Automated extraction of DBU consumption (30d/60d), workspace list, consumption mode breakdown |
-| Engagement classification | Subjective assessment | LLM classifies pillar, service type, engagement format, and estimated complexity |
-| CAST framework | Write from scratch in a doc | Auto-populated from ASQ description with explicit "to be refined" markers for incomplete elements |
-| Google Drive workspace | Manually create folder, subfolders, docs | Auto-creates `AR-XXXXX_CustomerName/` with research/, sessions/, code/, comms/ subfolders |
-| CONTEXT + STATUS docs | Write from scratch | Templated Google Docs with ASQ details, CAST, account team, customer profile, classification |
-| **Shared knowledge base** | **None — each skill queried SFDC independently** | **Google Drive IDs recorded in CONTEXT doc; all downstream skills read/write to this workspace, building cumulative context across the entire engagement lifecycle** |
-
-**Why this matters:** In the original fe-sts, every skill starts from scratch — querying SFDC, searching Slack, re-gathering the same context. With `asq-intake`, the CONTEXT doc becomes the single source of truth. Meeting prep reads it, post-meeting actions update it, close reads the full history. The knowledge base grows with every interaction, eliminating redundant queries and ensuring no context is lost between sessions.
-
-**New files:** `SKILL.md` (342 lines)
 
 ---
 
@@ -272,7 +273,7 @@ fe-sts/
 │   ├── sts-help.md
 │   └── sts-config.md
 └── skills/
-    ├── asq-triage/          ← NEW (Hackathon Idea 1)
+    ├── asq-triage/          ← NEW (Phase 1)
     │   ├── SKILL.md
     │   └── references/
     │       ├── triage-rules.md
@@ -280,14 +281,14 @@ fe-sts/
     │       ├── comment-templates.md
     │       ├── sfdc-schema.md
     │       └── cache-setup.md
-    ├── asq-onboarding/      (existing)
-    ├── asq-refresher/       ← ENHANCE (Idea 2)
-    ├── asq-update/          ← ENHANCE (Idea 3)
-    ├── asq-close/           (existing)
-    ├── success-story-generator/ ← NEW (Hackathon Idea 4)
+    ├── asq-intake/          ← NEW (Phase 2)
+    ├── asq-onboarding/      (existing, Phase 3)
+    ├── asq-refresher/       ← ENHANCED (Phase 4a)
+    ├── asq-update/          ← ENHANCE (Phase 4b, planned)
+    ├── asq-close/           (existing, Phase 5)
+    ├── success-story-generator/ ← ADAPTED (Phase 6)
     ├── asq-local-cache/     (existing)
-    ├── asq-intake/          ← NEW (Hackathon Idea 6)
-    └── asq-scheduler/       ← NEW (Idea 5, planned)
+    └── asq-scheduler/       ← NEW (planned)
 ```
 
 ---

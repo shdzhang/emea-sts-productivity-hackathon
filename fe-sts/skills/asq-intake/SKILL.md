@@ -19,18 +19,30 @@ Extracts ASQ information from Salesforce, performs initial customer discovery, c
 Input: ASQ number (e.g., `AR-123456`), or customer name / search term
 Process:
 1. If ASQ number provided:
-   - Fetch ASQ record directly from Salesforce
+   - Fetch ASQ record directly from Salesforce using sf CLI:
+   ```bash
+   sf data query --query "SELECT Id, Name, Status__c, Support_Type__c, Additional_Services__c, Request_Description__c, Account__c, Account__r.Name, CreatedDate, Start_Date__c, End_Date__c, CreatedBy.Name, LastModifiedDate, Request_Status_Notes__c FROM ApprovalRequest__c WHERE Name = 'AR-XXXXXX'" --json
+   ```
+   **NOTE:** Do NOT use `Last_SA_Engaged__r` — this relationship is not valid on ApprovalRequest__c. Fetch account owner separately in Phase 2.
 2. If customer name or search term provided:
-   - Search Salesforce for matching ASQs
+   - Search Salesforce for matching ASQs:
+   ```bash
+   sf data query --query "SELECT Id, Name, Status__c, Support_Type__c, Account__r.Name FROM ApprovalRequest__c WHERE Account__r.Name LIKE '%CUSTOMER_NAME%' AND Status__c IN ('In Progress', 'On Hold', 'New')" --json
+   ```
    - If multiple matches, present list for user selection
 3. Extract from the ASQ record:
    - **ASQ metadata:** number, status, creation date, requested start/end dates, additional services (service type)
    - **Request description:** the full description of what's being asked
-   - **Account team:** AE, SA/SE, and any other contacts listed (Last SA Engaged)
-   - **Customer type:** cloud provider (AWS, Azure, GCP)
+   - **Customer type:** cloud provider (AWS, Azure, GCP) — infer from description or account data
    - **Related use cases:** any linked use cases on the account
 4. If ASQ description is vague or incomplete, flag this explicitly — it signals a scoping call is needed
 Output: Structured ASQ metadata
+
+### Phase 1b: Retrieve Account Team
+```bash
+sf data query --query "SELECT Id, Name, OwnerId, Owner.Name, Owner.Email FROM Account WHERE Id = 'ACCOUNT_ID'" --json
+```
+Extract: Account owner (AE), plus the ASQ creator from Phase 1.
 
 ### Phase 2: Retrieve Account Data
 Input: Account ID from Phase 1
@@ -107,13 +119,21 @@ for subfolder_name in ["research", "sessions", "code", "comms"]:
 ```
 
 #### 5.4 Create the CONTEXT Google Doc
+
+**IMPORTANT:** `mcp__google__docs_document_create_from_markdown` requires a file path, not inline content. Write the markdown to a temp file first, then create the doc from the file.
+
 ```python
+# Step 1: Write markdown to temp file (use the Write tool)
+# Write to /tmp/context_{ar_number}.md with the CONTEXT template content
+# Include Google Drive References section with all folder/doc IDs from steps 5.1-5.3
+
+# Step 2: Create Google Doc from the temp file
 context_doc = mcp__google__docs_document_create_from_markdown(
-    title=f"CONTEXT",
-    file_content=context_markdown  # See CONTEXT template below
+    title="CONTEXT",
+    markdown_file_path="/tmp/context_{ar_number}.md"
 )
 
-# Move into engagement folder
+# Step 3: Move into engagement folder
 mcp__google__drive_file_update(
     file_id=context_doc_id,
     add_parents=[engagement_folder_id]
@@ -121,31 +141,27 @@ mcp__google__drive_file_update(
 ```
 
 #### 5.5 Create the STATUS Google Doc
+
 ```python
+# Step 1: Write markdown to temp file
+# Write to /tmp/status_{ar_number}.md with the STATUS template content
+
+# Step 2: Create Google Doc from the temp file
 status_doc = mcp__google__docs_document_create_from_markdown(
-    title=f"STATUS",
-    file_content=status_markdown  # See STATUS template below
+    title="STATUS",
+    markdown_file_path="/tmp/status_{ar_number}.md"
 )
 
-# Move into engagement folder
+# Step 3: Move into engagement folder
 mcp__google__drive_file_update(
     file_id=status_doc_id,
     add_parents=[engagement_folder_id]
 )
 ```
 
-#### 5.6 Record Google Drive References
-After creating all folders and documents, append a references section to the CONTEXT doc so other agents can locate resources by ID:
+#### 5.6 Update CONTEXT doc with document IDs
 
-```python
-mcp__google__docs_document_batch_update(
-    document_id=context_doc_id,
-    operation_type="modify_text",
-    params={
-        "text": google_drive_references_markdown  # See references template below
-    }
-)
-```
+Now that both docs are created, update the Google Drive References table in the CONTEXT doc with the actual CONTEXT and STATUS document IDs (which weren't known at write time).
 
 Output: Engagement folder with CONTEXT doc, STATUS doc, and all subfolders created in Google Drive
 
