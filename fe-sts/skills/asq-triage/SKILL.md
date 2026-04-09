@@ -69,6 +69,8 @@ python3 $ASQ_TOOLS sfdc-query "SELECT Approval_Request__r.Name, Approval_Request
 
 Apply stage requirements from `references/triage-rules.md`:
 - **Launch Accelerator** (including "Growth Accelerator for PAYG"): U3+
+- **Lakebridge** (Analyzer, Transpiler, Converter): U3+
+- **Workspace Setup**: U3+
 - **All other Support Types**: U4+
 
 If fail → status "Under Review", post Chatter from `references/comment-templates.md` (Template 1 or 2). **STOP.**

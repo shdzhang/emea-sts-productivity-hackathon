@@ -10,6 +10,8 @@
 | Support Type | Minimum UC Stage |
 |-------------|-----------------|
 | Launch Accelerator (incl. "Growth Accelerator for PAYG") | U3+ |
+| Lakebridge (Analyzer, Transpiler, Converter) | U3+ |
+| Workspace Setup | U3+ |
 | All other Support Types | U4+ |
 
 If no use case is linked, or none meet the stage requirement → Under Review.
@@ -169,7 +171,7 @@ python3 $ASQ_TOOLS sfdc-query "SELECT Approval_Request__r.Name, Use_Case__r.Name
 
 | Original Issue | How to Check |
 |---------------|-------------|
-| UC stage too low | Compare current `Use_Case__r.Stages__c` against requirement (U4+ or U3+ for LA). If UC shows "Lost", flag for rejection. |
+| UC stage too low | Compare current `Use_Case__r.Stages__c` against requirement (U4+, or U3+ for LA, Lakebridge, and Workspace Setup). If UC shows "Lost", flag for rejection. |
 | No description | Check `Request_Description__c` — is it still empty/template-only? |
 | Consumption too high (LA) | Re-check consumption via logfood or Genie |
 | Out of scope | Check if `Request_Description__c` was updated with new context since the triage comment date |
