@@ -1,6 +1,6 @@
 ---
 name: asq-refresher
-description: Generate an ASQ status brief — what happened, where we are, and what's next. Gathers from SFDC, Slack, Gmail, Calendar, DBRA, Logfood, and Genie. Triggers on 'asq status', 'where are we with', 'what is the status', 'summarize meeting', 'meeting summary', 'last meeting', 'recap meeting', 'next meeting', 'upcoming meeting', 'what do I discuss', 'meeting prep', 'refresh me on', 'prep me for', 'deep refresher', 'account brief', 'full brief'.
+description: Prepare an executive-ready meeting brief with ASQ context, consumption trends (Logfood), internal research (DBRA), Genie metrics, and synthesized talking points. Gathers from SFDC, Slack, Gmail, Calendar, Genie, Logfood, DBRA, and Glean. Triggers on 'next meeting', 'upcoming meeting', 'what do I discuss', 'meeting prep', 'refresh me on', 'prep me for', 'deep refresher', 'account brief', 'full brief'.
 ---
 
 # ASQ Meeting Refresher
