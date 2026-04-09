@@ -12,62 +12,83 @@ Clone of [fe-sts](https://github.com/databricks-field-eng/vibe/tree/main/plugins
 
 ```mermaid
 graph TD
-    A["<b>New ASQ Arrives</b>"] --> A1
+    A["<b>New ASQ Arrives</b>"] --> B
 
-    subgraph A1["0 - INTAKE  ✅ Done"]
-        A1a["Extract SFDC Data"] --> A1b["Classify Engagement"]
-        A1b --> A1c["Create GDrive Workspace"]
-    end
-
-    A1 --> B
-
-    subgraph B["1 - TRIAGE  ✅ Done"]
+    subgraph B["1 - TRIAGE"]
         B1["Validate UC Stage"] --> B2["Check Consumption"]
         B2 --> B3["LLM Scope Scoring"]
-        B3 --> B4["Auto-Assign"]
+        B3 --> B4["Auto-Assign to Engineer"]
     end
 
-    B --> C
+    B --> I
 
-    subgraph C["2 - ONBOARDING  (existing)"]
+    subgraph I["2 - INTAKE"]
+        I1["Extract SFDC Data"] --> I2["Classify Engagement"]
+        I2 --> I3["Create Knowledge Base"]
+    end
+
+    I --> C
+
+    subgraph C["3 - ONBOARDING"]
         C1["Create Slack Channel → Invite AT → Update SFDC"]
     end
 
     C --> D
 
-    subgraph D["3 - ENGAGEMENT LOOP  (prep ✅ / actions ⏳)"]
-        D1["Meeting Prep ✅"] --> D2["Customer Meeting"]
+    subgraph D["4 - ENGAGEMENT LOOP"]
+        D1["Meeting Prep"] --> D2["Customer Meeting"]
         D2 --> D3["Post-Meeting Actions"]
         D3 -.-> D1
     end
 
     D --> E
 
-    subgraph E["4 - CLOSE + SUCCESS STORY  ✅ Done"]
+    subgraph E["5 - CLOSE"]
         E1["Consumption Analysis"] --> E2["STAR Close Notes"]
         E2 --> E3["Update SFDC + Slack"]
     end
 
     E --> F
 
-    subgraph F["5 - SUCCESS STORY  ✅ Done"]
+    subgraph F["6 - SUCCESS STORY"]
         F1["Score Worthiness"] --> F2["Generate Narrative + Charts"]
         F2 --> F3["Publish to Docs + Slack"]
     end
+
+    KB[("KNOWLEDGE BASE\n(Google Drive)\nCONTEXT + STATUS docs")]
+    I -- "creates" --> KB
+    D -- "reads & writes" --> KB
+    E -- "reads" --> KB
+    F -- "reads" --> KB
 
     G["SCHEDULER  ⏳ Planned"] -.->|"auto-triage"| B
     G -.->|"daily prep"| D
     G -.->|"weekly digest"| E
 
-    style A1 fill:#00695c,color:#fff,stroke:#004d40,stroke-width:3px
     style B fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:3px
+    style I fill:#00695c,color:#fff,stroke:#004d40,stroke-width:3px
     style C fill:#1565c0,color:#fff,stroke:#0d47a1
     style D fill:#6a1b9a,color:#fff,stroke:#4a148c
     style E fill:#e65100,color:#fff,stroke:#bf360c,stroke-width:3px
     style F fill:#c62828,color:#fff,stroke:#b71c1c,stroke-width:3px
+    style KB fill:#f9a825,color:#000,stroke:#f57f17,stroke-width:3px
     style G fill:#37474f,color:#fff,stroke:#263238
     style A fill:#424242,color:#fff,stroke:#212121
 ```
+
+### Key Innovation: Shared Knowledge Base
+
+The `asq-intake` skill creates a **per-ASQ Google Drive workspace** that serves as a shared knowledge base for all downstream skills. Each skill in the lifecycle reads from and writes back to this workspace, building a cumulative context that gets richer over time:
+
+| Lifecycle Phase | Reads from KB | Writes to KB |
+|----------------|---------------|--------------|
+| **Intake** | — | Creates CONTEXT doc (ASQ details, CAST, classification) + STATUS doc + folder structure |
+| **Meeting Prep** | CONTEXT doc for engagement background, past session notes | — (read-only) |
+| **Post-Meeting** | CONTEXT for context, STATUS for current phase | Session notes to sessions/, updated STATUS |
+| **Close** | Full engagement history from CONTEXT + sessions/ | Final close notes, outcome summary |
+| **Success Story** | CONTEXT + consumption data + session history | Published story draft to research/ |
+
+This means every skill has full context without re-querying SFDC or Slack — and the knowledge base grows with every interaction. Google Drive IDs are stored in the CONTEXT doc so any agent can locate resources programmatically.
 
 ---
 
@@ -197,9 +218,9 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ### Idea 6: ASQ Intake — `asq-intake` (Aleksandra Stanojevic) ✅
 
-**Before:** No intake skill existed. Engineers manually looked up ASQ details in Salesforce, created Google Drive folders by hand, and wrote CONTEXT/STATUS docs from scratch.
+**Before:** No intake skill existed. Engineers manually looked up ASQ details in Salesforce, created Google Drive folders by hand, and wrote CONTEXT/STATUS docs from scratch. Each skill operated in isolation with no shared state.
 
-**After:** Brand-new 342-line SKILL.md with 6-phase workflow:
+**After:** Brand-new 342-line SKILL.md with 6-phase workflow that introduces the **shared knowledge base** pattern — the most innovative part of the hackathon:
 
 | Capability | Before (manual) | After (asq-intake) |
 |-----------|-----------------|---------------------|
@@ -209,7 +230,9 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 | CAST framework | Write from scratch in a doc | Auto-populated from ASQ description with explicit "to be refined" markers for incomplete elements |
 | Google Drive workspace | Manually create folder, subfolders, docs | Auto-creates `AR-XXXXX_CustomerName/` with research/, sessions/, code/, comms/ subfolders |
 | CONTEXT + STATUS docs | Write from scratch | Templated Google Docs with ASQ details, CAST, account team, customer profile, classification |
-| Cross-agent references | None | Google Drive IDs recorded in CONTEXT doc so downstream agents can locate resources |
+| **Shared knowledge base** | **None — each skill queried SFDC independently** | **Google Drive IDs recorded in CONTEXT doc; all downstream skills read/write to this workspace, building cumulative context across the entire engagement lifecycle** |
+
+**Why this matters:** In the original fe-sts, every skill starts from scratch — querying SFDC, searching Slack, re-gathering the same context. With `asq-intake`, the CONTEXT doc becomes the single source of truth. Meeting prep reads it, post-meeting actions update it, close reads the full history. The knowledge base grows with every interaction, eliminating redundant queries and ensuring no context is lost between sessions.
 
 **New files:** `SKILL.md` (342 lines)
 
