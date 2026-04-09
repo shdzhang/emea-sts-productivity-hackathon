@@ -78,9 +78,9 @@ graph TD
 | 1 | **ASQ Auto-Triage** | Shidong Zhang | `asq-triage` | **Done** | Automates the full triage decision tree: UC stage validation, consumption checks, LLM scope scoring, competency-matrix assignment. Reduces 10-15 min/ASQ to seconds. |
 | 2 | **Enhanced Meeting Prep** | Nadja Bulajic | `asq-refresher` | **Done** | Rewrites the refresher from a 4-step sequential flow to a 5-step parallel enrichment workflow with DBRA deep research, Logfood consumption metrics, Genie trends, and LLM synthesis into executive-ready briefs. ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
 | 3 | **Post-Meeting Actions** | TBD | `asq-update` | Planned | Extend with customer follow-up emails, structured action-item extraction, next-meeting scheduling, and UCO stage updates. |
-| 4 | **Success Story Generator** | Nada | `success-story-generator` | **Done** | Brand-new skill for generating consumption-correlated success stories with 4-criterion scoring rubric, metric mappings, chart generation, and Google Docs publishing. |
+| 4 | **Success Story Generator** | Nada El Atlassi | `success-story-generator` | **Done** | Brand-new skill for generating consumption-correlated success stories with 4-criterion scoring rubric, metric mappings, chart generation, and Google Docs publishing. |
 | 5 | **ASQ Scheduler** | TBD | `asq-scheduler` | Planned | Scheduling infrastructure to automate skill invocation on a cadence (triage every 2h, daily meeting prep, weekly digest). |
-| 6 | **ASQ Intake** | TBD | `asq-intake` | **Done** | Extracts ASQ data from Salesforce, classifies the engagement, and creates a structured Google Drive workspace with CONTEXT and STATUS docs. |
+| 6 | **ASQ Intake** | Aleksandra Stanojevic | `asq-intake` | **Done** | Extracts ASQ data from Salesforce, classifies the engagement, and creates a structured Google Drive workspace with CONTEXT and STATUS docs. |
 
 > **Note:** `asq-triage` (Idea 1), `asq-refresher` (Idea 2), `success-story-generator` (Idea 4), and `asq-intake` (Idea 6) have been implemented. The other skills currently contain their original fe-sts v2.0.2 code and will be updated in-place once hackathon implementations are ready.
 
@@ -168,7 +168,7 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ---
 
-### Idea 4: Success Story Generator — `success-story-generator` (Nada) ✅
+### Idea 4: Success Story Generator — `success-story-generator` (Nada El Atlassi) ✅
 
 **Before:** The [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) plugin existed in the experimental marketplace but was disconnected from the main ASQ lifecycle. Engineers had to manually invoke it separately and decide which ASQs were story-worthy.
 
@@ -195,7 +195,7 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 ---
 
-### Idea 6: ASQ Intake — `asq-intake` (TBD) ✅
+### Idea 6: ASQ Intake — `asq-intake` (Aleksandra Stanojevic) ✅
 
 **Before:** No intake skill existed. Engineers manually looked up ASQ details in Salesforce, created Google Drive folders by hand, and wrote CONTEXT/STATUS docs from scratch.
 
