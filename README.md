@@ -99,7 +99,7 @@ This means every skill has full context without re-querying SFDC or Slack — an
 | 1 | **ASQ Auto-Triage** | Shidong Zhang | `asq-triage` | **Done** | Automates the full triage decision tree: UC stage validation, consumption checks, LLM scope scoring, competency-matrix assignment. Reduces 10-15 min/ASQ to seconds. |
 | 2 | **Enhanced Meeting Prep** | Nadja Bulajic | `asq-refresher` | **Done** | Rewrites the refresher from a 4-step sequential flow to a 5-step parallel enrichment workflow with DBRA deep research, Logfood consumption metrics, Genie trends, and LLM synthesis into executive-ready briefs. ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
 | 3 | **Post-Meeting Actions** | TBD | `asq-update` | Planned | Extend with customer follow-up emails, structured action-item extraction, next-meeting scheduling, and UCO stage updates. |
-| 4 | **Success Story Generator** | Nada El Atlassi | `success-story-generator` | **Done** | Brand-new skill for generating consumption-correlated success stories with 4-criterion scoring rubric, metric mappings, chart generation, and Google Docs publishing. |
+| 4 | **Success Story Generator** | Nada El Atlassi | `success-story-generator` | **Done** | Adapted from [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) with improved scoring rubric, metric mappings, chart generation, and Google Docs publishing. |
 | 5 | **ASQ Scheduler** | TBD | `asq-scheduler` | Planned | Scheduling infrastructure to automate skill invocation on a cadence (triage every 2h, daily meeting prep, weekly digest). |
 | 6 | **ASQ Intake** | Aleksandra Stanojevic | `asq-intake` | **Done** | Extracts ASQ data from Salesforce, classifies the engagement, and creates a structured Google Drive workspace with CONTEXT and STATUS docs. |
 
@@ -122,7 +122,7 @@ This means every skill has full context without re-querying SFDC or Slack — an
 | `asq-triage` | **Brand new** — full triage automation with 8-phase workflow, 5 reference docs, LLM scope scoring, competency-matrix assignment |
 | `asq-refresher` | **Done** — rewritten with parallel DBRA + Logfood + Genie enrichment, LLM synthesis, brief template, graceful degradation ([PR #1](https://github.com/shdzhang/emea-sts-productivity-hackathon/pull/1)) |
 | `asq-update` | Extended with follow-up emails, action-item extraction, meeting scheduling |
-| `success-story-generator` | **Done** — brand-new skill with 5-phase workflow, 4-criterion scoring rubric, metric mappings, chart generation script, and Google Docs output |
+| `success-story-generator` | **Done** — adapted from [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) with improved scoring, metric mappings, chart generation, and Google Docs output |
 | `asq-scheduler` | **Brand new** — scheduling infrastructure for automated skill invocation |
 | `asq-intake` | **Done** — brand-new skill: SFDC extraction, engagement classification, Google Drive workspace creation with CONTEXT + STATUS docs |
 
@@ -193,7 +193,7 @@ Detailed comparison of hackathon deliverables against the [upstream fe-sts v2.0.
 
 **Before:** The [sts-success-stories](https://github.com/databricks-eng/plugin-marketplace/tree/main/experimental/teams/fe-sts/sts-success-stories) plugin existed in the experimental marketplace but was disconnected from the main ASQ lifecycle. Engineers had to manually invoke it separately and decide which ASQs were story-worthy.
 
-**After:** Brand-new 350-line SKILL.md with 5-phase workflow, 3 reference docs, and a chart generation script (772 lines total):
+**After:** Adapted and improved into a 350-line SKILL.md with 5-phase workflow, 3 reference docs, and a chart generation script (772 lines total):
 
 | Capability | Before (manual) | After (success-story-generator) |
 |-----------|-----------------|--------------------------------|
