@@ -110,6 +110,20 @@ Check prerequisites against the cached service scope. Flag as informational for 
 
 Check conversion signals from `references/triage-rules.md`. Flag as recommendation, not a block.
 
+## Phase 4d: Check Team Calendar for PTO
+
+Query the EMEA STS team calendar for PTO and public holidays covering the assignment period (this week + next 2 weeks):
+
+```bash
+CALENDAR_ID="c_ongptofm03eu3c2dq6r9mr7idc%40group.calendar.google.com"
+TOKEN=$(python3 $GOOGLE_AUTH token)
+curl -s "https://www.googleapis.com/calendar/v3/calendars/${CALENDAR_ID}/events?timeMin=<TODAY>T00:00:00%2B02:00&timeMax=<TODAY+14>T23:59:59%2B02:00&singleEvents=true&orderBy=startTime&maxResults=50" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "x-goog-user-project: gcp-sandbox-field-eng"
+```
+
+Use PTO data as a constraint in Phase 6 assignment — do not assign ASQs to team members who are on PTO during the requested start date window. Flag overdue ASQs that would be further delayed by PTO.
+
 ## Phase 5: Get Team Workload
 
 > **This phase MUST run before assignment** — workload is a key input to the scoring formula.

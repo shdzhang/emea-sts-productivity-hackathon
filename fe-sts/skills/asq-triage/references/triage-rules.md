@@ -78,6 +78,7 @@ Score against the **cached service scope** from the Slides deck. If cache is una
 | Hands-on implementation ("build for us") | Professional Services or Partners | — | "Build a Delta Live Tables pipeline for our data" |
 | Training, workshops, enablement, "learn about X" | Databricks Academy (free self-paced), DB Demos, Solutions Accelerators | academy.databricks.com | "Train our team of 20 on Databricks fundamentals" |
 | L400+ deep architecture reviews, advanced perf tuning | Specialist Solution Architects (SSA) via ASQ | — | "Review our entire Spark cluster architecture" |
+| Explicitly requests SSA / product specialist help | SSA queue — redirect via "Change Request Type" button in SFDC UI (cannot be done via API) | — | "We need SSA help", "Need an SSA to come present / resolve / deploy" |
 | Break-fix, production errors, bugs, outages | Databricks Support | — | "Workspace is giving 403 errors when users try to login" |
 | Generic office hours / general Q&A | Not supported — STS does ASQ-specific engagements only | — | "Can we set up weekly office hours for our team?" |
 | Full code reviews | Not supported | — | "Review all our notebooks for best practices" |
