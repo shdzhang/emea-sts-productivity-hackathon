@@ -78,11 +78,29 @@ Score against the **cached service scope** from the Slides deck. If cache is una
 | Hands-on implementation ("build for us") | Professional Services or Partners | — | "Build a Delta Live Tables pipeline for our data" |
 | Training, workshops, enablement, "learn about X" | Databricks Academy (free self-paced), DB Demos, Solutions Accelerators | academy.databricks.com | "Train our team of 20 on Databricks fundamentals" |
 | L400+ deep architecture reviews, advanced perf tuning | Specialist Solution Architects (SSA) via ASQ | — | "Review our entire Spark cluster architecture" |
-| Explicitly requests SSA / product specialist help | SSA queue — redirect via "Change Request Type" button in SFDC UI (cannot be done via API) | — | "We need SSA help", "Need an SSA to come present / resolve / deploy" |
 | Break-fix, production errors, bugs, outages | Databricks Support | — | "Workspace is giving 403 errors when users try to login" |
 | Generic office hours / general Q&A | Not supported — STS does ASQ-specific engagements only | — | "Can we set up weekly office hours for our team?" |
 | Full code reviews | Not supported | — | "Review all our notebooks for best practices" |
 | DBR version migration | 1:many office hours only (monthly) — no ASQ needed | #dbr-migration-squad | "Migrate all our notebooks from DBR 13 to DBR 15" |
+
+### SSA Mention Handling
+
+When an ASQ explicitly mentions SSA ("need an SSA", "SSA to help", etc.), do **NOT** automatically redirect to the SSA queue. Instead, apply the following decision tree:
+
+1. **Check the actual ask** — read the full description and identify the concrete technical work being requested. Ignore the "SSA" label and focus on the substance.
+2. **Map the ask to STS services** — does the actual work align with an STS service (Workspace Setup, UC Setup, CI/CD, Lakeflow, AI/BI Data Citizen, GenAI Apps, etc.)? Use the cached service scope or keyword mapping.
+3. **Check UC stage** — does the linked use case meet the minimum stage requirement for the relevant STS service?
+4. **Decision**:
+   - **If the actual ask maps to an STS service AND UC stage passes** → Assign as a normal ASQ. Flag in notes: "Creator requested SSA but actual ask aligns with STS [service name]."
+   - **If the actual ask is genuinely L400+ / deep specialist work that exceeds STS scope** (e.g., advanced performance tuning across an entire cluster fleet, deep product internals, custom connector development) → Under Review with Template 6 (SSA redirect).
+   - **If ambiguous** — the ask partially overlaps STS scope but also has L400+ elements → Under Review, ask the creator to clarify which parts need SSA vs. STS support.
+
+**Rationale**: Account teams often use "SSA" as a generic term for any Databricks technical specialist. Many requests that mention SSA are actually standard STS coaching engagements (e.g., CI/CD guidance, workspace setup, Lakeflow enablement). Automatically redirecting these loses the customer engagement and creates unnecessary friction.
+
+**Examples**:
+- "SSA to support on the MVP and guide the partner for data integration" → IS in scope (Data Sharing / Lakeflow). Assign with note.
+- "Need an SSA with platform experience for CI/CD configuration" when the actual work is researching a niche cross-cloud auth topic → genuinely SSA-level. Redirect.
+- "SSA to help with AI/BI Genie onboarding and best practices" → IS in scope (AI/BI Data Citizen). Assign with note.
 
 **Important**: Before flagging out-of-scope, always recommend free enablement resources first. STS ASQs should follow enablement, not replace it.
 

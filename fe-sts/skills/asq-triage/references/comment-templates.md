@@ -172,9 +172,9 @@ python3 $ASQ_TOOLS sfdc-chatter /tmp/asq_chatter_<AR>.json
 [
   {"type": "Text", "text": "Hi "},
   {"type": "Mention", "id": "<CREATOR_USER_ID>"},
-  {"type": "Text", "text": ", I've assigned the ASQ to "},
+  {"type": "Text", "text": ", "},
   {"type": "Mention", "id": "<ASSIGNEE_USER_ID>"},
-  {"type": "Text", "text": ", please align with them on scope and timelines."}
+  {"type": "Text", "text": " will support this, please align with them on scope and timelines."}
 ]
 ```
 
@@ -206,9 +206,9 @@ python3 $ASQ_TOOLS sfdc-chatter /tmp/asq_chatter_<AR>.json
 [
   {"type": "Text", "text": "Hi "},
   {"type": "Mention", "id": "<CREATOR_USER_ID>"},
-  {"type": "Text", "text": ", thanks for updating the [use case stage / description]. I've now assigned the ASQ to "},
+  {"type": "Text", "text": ", thanks for updating the [use case stage / description]. "},
   {"type": "Mention", "id": "<ASSIGNEE_USER_ID>"},
-  {"type": "Text", "text": ", please align with them on scope and timelines."}
+  {"type": "Text", "text": " will support this, please align with them on scope and timelines."}
 ]
 ```
 

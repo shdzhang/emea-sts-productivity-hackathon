@@ -89,6 +89,9 @@ Also check for LA-to-Core and Core-to-LA conversion signals (see triage-rules.md
 > - "customer wants to learn best practices for UC Setup" → IS in scope (coaching)
 > - "architecture review of their workspace" → IS in scope if L200 guidance
 > - "SSA helped previously, now need STS for CI/CD" → IS in scope
+> - "Need an SSA to help with Lakeflow setup" → IS in scope (creator used "SSA" generically — actual ask is Lakeflow enablement)
+>
+> **SSA Mention Rule**: When a description mentions "SSA", do NOT auto-redirect. Check the actual ask against STS services and UC stage. See `references/triage-rules.md` (SSA Mention Handling section). If in scope → assign with a note. If genuinely L400+ → Under Review + Template 6.
 
 ### 4a: Scope Score (1-10)
 
