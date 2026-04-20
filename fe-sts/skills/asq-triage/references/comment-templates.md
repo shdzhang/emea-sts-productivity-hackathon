@@ -23,10 +23,15 @@ All Chatter comments are posted via `sfdc-chatter` using a JSON payload. @mentio
 ### How to Get User IDs
 
 - **Creator**: Use `CreatedById` from the ASQ record (already available from Phase 1 query)
-- **Assignee**: Query the User object if needed:
+- **Assignee**: Look up from the pre-resolved team member cache (built during Phase 0):
   ```bash
-  python3 $ASQ_TOOLS sfdc-query "SELECT Id, Name, Email FROM User WHERE Name = '<assignee name>'"
+  python3 -c "import json; d=json.load(open('$HOME/asq-local-cache/triage/team_member_ids.json')); print(d.get('<assignee name>', {}).get('id', 'NOT_FOUND'))"
   ```
+  If the name is not in the cache (e.g., ad-hoc assignment outside the team), fall back to SOQL with an internal-user filter:
+  ```bash
+  python3 $ASQ_TOOLS sfdc-query "SELECT Id, Name, Email FROM User WHERE Name = '<assignee name>' AND UserType = 'Standard'"
+  ```
+  > **CRITICAL: Always include `UserType = 'Standard'`** to exclude portal/customer community users. Salesforce can have multiple users with the same name — omitting this filter risks tagging a customer contact instead of the Databricks employee.
 
 ### Posting a Comment
 

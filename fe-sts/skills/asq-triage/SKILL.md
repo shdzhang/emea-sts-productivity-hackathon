@@ -31,8 +31,9 @@ User config must exist at `~/asq-local-cache/user_config.yaml`. If any command r
 Follow `references/cache-setup.md` to check freshness and fetch if stale:
 1. Check `~/asq-local-cache/triage/cache_meta.yaml` for timestamps
 2. If `sts_service_scope.md` is missing or >7 days old → fetch from Google Slides
-3. If `competency_matrix.json` is missing or >7 days old → fetch from Google Sheets
-4. If fresh → read directly from cache
+3. If `competency_matrix.json` is missing or >7 days old → fetch from Google Sheets, then run **Team Member ID Resolution** to pre-resolve names → SFDC User IDs into `team_member_ids.json`
+4. If `team_member_ids.json` is missing but `competency_matrix.json` is fresh → run ID resolution only
+5. If all fresh → read directly from cache
 
 If the user says "refresh" or "force refresh", re-fetch both regardless of age.
 
@@ -125,22 +126,29 @@ curl -s "https://www.googleapis.com/calendar/v3/calendars/${CALENDAR_ID}/events?
   -H "x-goog-user-project: gcp-sandbox-field-eng"
 ```
 
+**Match calendar events to team members using the cached `team_member_ids.json` emails.** Calendar events contain attendee emails (`attendees[].email`) and creator emails (`creator.email`). Build a reverse lookup (email → name) from the cache to reliably identify who is on PTO — do not fuzzy-match on event summary/title text.
+
 Use PTO data as a constraint in Phase 6 assignment — do not assign ASQs to team members who are on PTO during the requested start date window. Flag overdue ASQs that would be further delayed by PTO.
 
 ## Phase 5: Get Team Workload
 
 > **This phase MUST run before assignment** — workload is a key input to the scoring formula.
 
-Extract team names from the cached competency matrix, then query **each member individually** to handle names with special characters (e.g., diacritics like š, ć, í).
-
-> **CRITICAL: Do NOT use a single `Owner.Name IN (...)` query.** Names with Unicode characters (e.g., "Jovan Višnjić", "Gergelj Kiš") silently return 0 results in a bulk IN clause via the `sf` CLI. Query each team member separately.
+Use the cached `team_member_ids.json` to get all team member SFDC User IDs, then run a **single bulk query** using `OwnerId IN (...)`. This avoids the Unicode name issues that break `Owner.Name IN (...)` queries and collapses N individual queries into one.
 
 ```bash
-# For EACH team member name from the matrix:
-python3 $ASQ_TOOLS sfdc-query "SELECT Owner.Name, Status__c, Support_Type__c, COUNT(Id) cnt FROM ApprovalRequest__c WHERE Owner.Name = '<TEAM_MEMBER_NAME>' AND Status__c IN ('In Progress','On Hold') GROUP BY Owner.Name, Status__c, Support_Type__c"
+# 1. Build the OwnerId list from the cache
+python3 -c "
+import json
+ids = json.load(open('$HOME/asq-local-cache/triage/team_member_ids.json'))
+print(','.join(\"'\" + v['id'] + \"'\" for v in ids.values()))
+"
+
+# 2. Single bulk workload query
+python3 $ASQ_TOOLS sfdc-query "SELECT OwnerId, Owner.Name, Status__c, Support_Type__c, COUNT(Id) cnt FROM ApprovalRequest__c WHERE OwnerId IN (<ID_LIST>) AND Status__c IN ('In Progress','On Hold') GROUP BY OwnerId, Owner.Name, Status__c, Support_Type__c"
 ```
 
-> **Note**: No `RecordType.Name` filter is needed — when querying by individual owner name, the results naturally scope to their ASQs.
+> **Note**: Using `OwnerId` instead of `Owner.Name` is both faster (single query vs N queries) and avoids silent failures with Unicode characters (e.g., š, ć, í) in the `sf` CLI.
 
 **Weighted workload** = `IP_regular×1 + IP_LA×2 + OH_regular×0.5 + OH_LA×1.0`
 
@@ -207,9 +215,22 @@ Then the action summary.
 
 ## Phase 8: Execute (After Approval)
 
-### Update ASQ Statuses
+### Update ASQ Statuses and Assign Owner
+
+For ASQs being assigned ("On Hold"), update both `Status__c` and `OwnerId`. Look up the assignee's SFDC User ID from the cached `team_member_ids.json`:
+
 ```bash
-python3 -c "import json; json.dump({'Status__c': '<Under Review or On Hold>'}, open('/tmp/asq_triage_<AR>.json','w'))"
+# Get assignee ID from cache
+ASSIGNEE_ID=$(python3 -c "import json; print(json.load(open('$HOME/asq-local-cache/triage/team_member_ids.json'))['<assignee name>']['id'])")
+
+# Update ASQ with status + owner
+python3 -c "import json; json.dump({'Status__c': 'On Hold', 'OwnerId': '$ASSIGNEE_ID'}, open('/tmp/asq_triage_<AR>.json','w'))"
+python3 $ASQ_TOOLS sfdc-update <ASQ_ID> /tmp/asq_triage_<AR>.json
+```
+
+For "Under Review" ASQs (no owner change):
+```bash
+python3 -c "import json; json.dump({'Status__c': 'Under Review'}, open('/tmp/asq_triage_<AR>.json','w'))"
 python3 $ASQ_TOOLS sfdc-update <ASQ_ID> /tmp/asq_triage_<AR>.json
 ```
 
@@ -217,7 +238,7 @@ For batch: `python3 $ASQ_TOOLS sfdc-batch-update /tmp/asq_triage_batch.json`
 
 ### Post Chatter Comments
 
-Construct payloads per `references/comment-templates.md`, then post:
+Construct payloads per `references/comment-templates.md`. Use `team_member_ids.json` for assignee `<ASSIGNEE_USER_ID>` in mention segments. Then post:
 ```bash
 python3 $ASQ_TOOLS sfdc-chatter /tmp/asq_chatter_<AR>.json
 ```

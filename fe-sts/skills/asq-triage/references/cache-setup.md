@@ -104,6 +104,68 @@ If the response contains `"error"` instead of `"valueRanges"`, google-auth is ex
 - `valueRanges[0].values[28][1:]` → start dates (tenure)
 - Ratings are strings: "Experienced", "Intermediate", "Beginner", "No Experience", or empty
 
+## Team Member ID Resolution (Post-fetch)
+
+After fetching the competency matrix, resolve all team member names to their **internal** Salesforce User IDs. This avoids name-based lookups at triage time, which can match portal/customer users instead of Databricks employees.
+
+```bash
+python3 << 'PYEOF'
+import json, subprocess, sys
+from pathlib import Path
+
+cache_dir = Path.home() / "asq-local-cache" / "triage"
+matrix_path = cache_dir / "competency_matrix.json"
+ids_path = cache_dir / "team_member_ids.json"
+
+# 1. Extract team member names from the matrix
+matrix = json.load(open(matrix_path))
+names = [n.strip() for n in matrix["valueRanges"][0]["values"][0][1:] if n.strip()]
+print(f"Resolving {len(names)} team member names...")
+
+# 2. Query each name individually (handles Unicode/diacritics safely)
+ASQ_TOOLS = list(Path.home().glob(".claude/plugins/cache/fe-vibe/fe-sts/*/skills/asq-local-cache/resources/asq_tools.py"))[0]
+team_ids = {}
+warnings = []
+
+for name in names:
+    escaped = name.replace("'", "\\'")
+    query = f"SELECT Id, Name, Email FROM User WHERE Name = '{escaped}' AND UserType = 'Standard' AND IsActive = true"
+    result = subprocess.run(
+        ["python3", str(ASQ_TOOLS), "sfdc-query", query],
+        capture_output=True, text=True
+    )
+    try:
+        data = json.loads(result.stdout)
+        # sfdc-query returns a plain JSON array, not {"records": [...]}
+        records = data if isinstance(data, list) else data.get("records", [])
+    except (json.JSONDecodeError, KeyError):
+        warnings.append(f"  WARNING: SOQL parse error for '{name}'")
+        continue
+
+    if len(records) == 1:
+        r = records[0]
+        team_ids[name] = {"id": r["Id"], "email": r["Email"]}
+    elif len(records) == 0:
+        warnings.append(f"  WARNING: No internal user found for '{name}'")
+    else:
+        # Multiple matches — pick the @databricks.com one
+        db_users = [r for r in records if r.get("Email", "").endswith("@databricks.com")]
+        if len(db_users) == 1:
+            r = db_users[0]
+            team_ids[name] = {"id": r["Id"], "email": r["Email"]}
+        else:
+            warnings.append(f"  WARNING: {len(records)} matches for '{name}': {[r['Email'] for r in records]}")
+
+# 3. Write the cache
+json.dump(team_ids, open(ids_path, "w"), indent=2)
+print(f"Resolved {len(team_ids)}/{len(names)} team members → {ids_path}")
+for w in warnings:
+    print(w)
+PYEOF
+```
+
+If any names produce warnings, investigate manually — the name in the Google Sheet may not match the Salesforce display name exactly.
+
 ## Updating cache_meta.yaml
 
 After any fetch, write/update the metadata. Uses simple `key: value` format (no PyYAML dependency):
@@ -122,6 +184,7 @@ for line in lines:
 # Update whichever source was just fetched:
 # meta['service_scope_fetched'] = datetime.now().isoformat()
 # meta['competency_matrix_fetched'] = datetime.now().isoformat()
+# meta['team_member_ids_fetched'] = datetime.now().isoformat()
 meta_path.write_text('\n'.join(f'{k}: {v}' for k, v in meta.items()) + '\n')
 "
 ```

@@ -96,31 +96,34 @@ See `references/comment-templates.md` for payload structure and templates.
 
 ## User Object
 
-Query team member SFDC IDs for Chatter @mentions:
+Team member SFDC User IDs are pre-resolved and cached in `~/asq-local-cache/triage/team_member_ids.json` (refreshed with the competency matrix on a 7-day TTL). Use this cache for Chatter @mentions, OwnerId assignment, and workload queries.
+
+If a name is not in the cache (e.g., ad-hoc assignment), fall back to SOQL with internal-user filters:
 
 ```sql
 SELECT Id, Name, Email
 FROM User
-WHERE Name IN ('Name1', 'Name2', ...)
+WHERE Name = '<name>'
+AND UserType = 'Standard'
 AND IsActive = true
 ```
 
-> Some team members may have multiple User records (old/new). Use the most recent active one.
+> **CRITICAL: Always include `UserType = 'Standard'`** to exclude portal/customer community users. Salesforce can have multiple users with the same name — omitting this filter risks resolving a customer contact instead of the Databricks employee.
 
 ## Workload Query
 
-> **CRITICAL: Do NOT use a single `Owner.Name IN (...)` query.** Names with Unicode characters (e.g., "Jovan Višnjić", "Gergelj Kiš") silently return 0 results in a bulk IN clause via the `sf` CLI. Query each team member separately.
-
-For each team member from the cached competency matrix (row 0):
+Use the cached `team_member_ids.json` to get all team member SFDC User IDs, then run a **single bulk query** using `OwnerId IN (...)`:
 
 ```sql
-SELECT Owner.Name, Status__c, Support_Type__c, COUNT(Id) cnt
+SELECT OwnerId, Owner.Name, Status__c, Support_Type__c, COUNT(Id) cnt
 FROM ApprovalRequest__c
-WHERE Owner.Name = '<INDIVIDUAL_NAME>'
+WHERE OwnerId IN ('005Vp...', '005Vp...', ...)
 AND Status__c IN ('In Progress', 'On Hold')
-GROUP BY Owner.Name, Status__c, Support_Type__c
+GROUP BY OwnerId, Owner.Name, Status__c, Support_Type__c
 ```
 
-No `RecordType.Name` filter is needed — individual owner queries naturally scope to their ASQs.
+> **Why `OwnerId` instead of `Owner.Name`**: Using IDs avoids two problems: (1) Unicode characters (e.g., š, ć, í) silently returning 0 results in `Owner.Name IN (...)` via the `sf` CLI, and (2) the need for N individual queries. A single `OwnerId IN (...)` query handles all team members reliably.
 
-Extract team member names dynamically from the cached competency matrix (row 0). Do NOT hardcode names.
+No `RecordType.Name` filter is needed — the OwnerId filter naturally scopes to team member ASQs.
+
+Extract team member IDs from `~/asq-local-cache/triage/team_member_ids.json`. Do NOT hardcode IDs.
