@@ -8,6 +8,7 @@ The STS service scope and competency matrix are cached locally at `~/asq-local-c
 ~/asq-local-cache/triage/
 ├── sts_service_scope.md          # Converted from Google Slides
 ├── competency_matrix.json        # Raw Sheets API response
+├── team_member_ids.json          # Pre-resolved SFDC User IDs for team members
 └── cache_meta.yaml               # Timestamps for TTL checks (simple key: value format)
 ```
 
@@ -72,6 +73,35 @@ If `sts_service_scope.md` is missing or older than 7 days:
    ```
 
 5. If google-auth is expired, run `/google-auth` first, then retry.
+
+## UC Stage Requirement Validation (Post-fetch)
+
+After fetching the STS service scope deck, scan the cached `sts_service_scope.md` for any slides or sections mentioning UC stage requirements (look for patterns like "U2+", "U3+", "U4+", "When to engage", stage requirements). Compare what the deck says against the rules in `references/triage-rules.md` (Use Case Stage Requirements table).
+
+**What to check:**
+1. Search `sts_service_scope.md` for stage requirement patterns: `U[0-9]+\+`, "when to engage", "minimum stage"
+2. For each service category found, compare the deck's stage requirement against `triage-rules.md`
+3. If any mismatch is found:
+   - **Print a clear WARNING** listing the service, deck value, and skill value
+   - **Ask the user** whether to update `triage-rules.md` to match the deck
+   - Do NOT silently proceed with outdated rules
+
+**Example output:**
+```
+UC Stage Validation:
+  Customer Onboarding (LA, WS, Genie): Deck says U3+, skill says U3+ ✓
+  Migrations (Lakebridge, AI/BI):      Deck says U2+, skill says U2+ ✓
+  Production Readiness (others):       Deck says U4+, skill says U4+ ✓
+```
+
+Or if a mismatch is found:
+```
+⚠ UC STAGE MISMATCH DETECTED:
+  Migrations: Deck says U2+, skill says U3+ ← OUTDATED
+  → Update triage-rules.md? (y/n)
+```
+
+> **Why this matters**: The go/sts deck is the source of truth for engagement rules. If the deck is updated (e.g., a service category's minimum stage changes), the skill must reflect that. Incorrect stage rules cause ASQs to be wrongly held back or wrongly assigned.
 
 ## Competency Matrix (Google Sheets → cached JSON)
 

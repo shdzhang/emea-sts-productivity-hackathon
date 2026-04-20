@@ -30,10 +30,12 @@ User config must exist at `~/asq-local-cache/user_config.yaml`. If any command r
 
 Follow `references/cache-setup.md` to check freshness and fetch if stale:
 1. Check `~/asq-local-cache/triage/cache_meta.yaml` for timestamps
-2. If `sts_service_scope.md` is missing or >7 days old → fetch from Google Slides
+2. If `sts_service_scope.md` is missing or >7 days old → fetch from Google Slides, then run **UC Stage Requirement Validation** to compare deck rules against `triage-rules.md` and flag any mismatches
 3. If `competency_matrix.json` is missing or >7 days old → fetch from Google Sheets, then run **Team Member ID Resolution** to pre-resolve names → SFDC User IDs into `team_member_ids.json`
 4. If `team_member_ids.json` is missing but `competency_matrix.json` is fresh → run ID resolution only
 5. If all fresh → read directly from cache
+
+> **CRITICAL**: Do NOT proceed with triage if the UC Stage Requirement Validation detects a mismatch. Ask the user to confirm whether to update the rules before continuing.
 
 If the user says "refresh" or "force refresh", re-fetch both regardless of age.
 
@@ -69,10 +71,9 @@ python3 $ASQ_TOOLS sfdc-query "SELECT Approval_Request__r.Name, Approval_Request
 ```
 
 Apply stage requirements from `references/triage-rules.md`:
-- **Launch Accelerator** (including "Growth Accelerator for PAYG"): U3+
-- **Lakebridge** (Analyzer, Transpiler, Converter): U3+
-- **Workspace Setup**: U3+
-- **All other Support Types**: U4+
+- **Customer Onboarding** (Launch Accelerator, Growth Accelerator for PAYG, Workspace Setup, Genie Foundation): U3+
+- **Migrations** (DWH Lakebridge Migration Foundation, AI/BI Migration): U2+
+- **Production Readiness** (all other Support Types — CI/CD, MLOps, Observability, Data Engineering, Data Warehousing, ML & GenAI, etc.): U4+
 
 If fail → status "Under Review", post Chatter from `references/comment-templates.md` (Template 1 or 2). **STOP.**
 

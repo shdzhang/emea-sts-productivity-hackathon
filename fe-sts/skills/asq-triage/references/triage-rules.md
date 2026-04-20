@@ -7,12 +7,16 @@
 
 ## Use Case Stage Requirements
 
-| Support Type | Minimum UC Stage |
-|-------------|-----------------|
-| Launch Accelerator (incl. "Growth Accelerator for PAYG") | U3+ |
-| Lakebridge (Analyzer, Transpiler, Converter) | U3+ |
-| Workspace Setup | U3+ |
-| All other Support Types | U4+ |
+| Category | Support Type | Minimum UC Stage |
+|----------|-------------|-----------------|
+| Customer Onboarding | Launch Accelerator (incl. "Growth Accelerator for PAYG") | U3+ |
+| Customer Onboarding | Workspace Setup | U3+ |
+| Customer Onboarding | Genie Foundation | U3+ |
+| Migrations | DWH Lakebridge Migration Foundation | U2+ |
+| Migrations | AI/BI Migration | U2+ |
+| Production Readiness | All other Support Types (CI/CD, MLOps, Observability, Data Engineering, Data Warehousing, ML & GenAI, etc.) | U4+ |
+
+> **Source**: "When to engage STS?" slide in go/sts deck. Customer Onboarding shows "U3/U4+" — LA and WS are U3+. Migrations are explicitly U2+. Production Readiness is U4+.
 
 If no use case is linked, or none meet the stage requirement → Under Review.
 
