@@ -30,7 +30,7 @@ if meta_path.exists():
             k, v = line.split(":", 1)
             meta[k.strip()] = v.strip().strip("'\"")
     now = datetime.now()
-    for key in ["service_scope_fetched", "competency_matrix_fetched"]:
+    for key in ["service_scope_fetched", "competency_matrix_fetched", "team_member_ids_fetched"]:
         ts = meta.get(key, "2000-01-01")
         age = (now - datetime.fromisoformat(ts)).days
         print(f"{key}: {age} days old {'(STALE)' if age > 7 else '(fresh)'}")

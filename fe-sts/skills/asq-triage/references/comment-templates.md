@@ -42,9 +42,9 @@ python3 $ASQ_TOOLS sfdc-chatter /tmp/asq_chatter_<AR>.json
 
 ---
 
-## Template 1: Under Review — UC Stage Not Met (non-Launch Accelerator)
+## Template 1: Under Review — UC Stage Not Met (Production Readiness — U4+)
 
-**When to use**: Support Type is NOT Launch Accelerator, and no linked Use Case meets U4+.
+**When to use**: Support Type is a Production Readiness service (not Launch Accelerator, not Workspace Setup, not Genie Foundation, not a Migration type), and no linked Use Case meets U4+.
 
 **Message segments**:
 ```json
@@ -57,9 +57,39 @@ python3 $ASQ_TOOLS sfdc-chatter /tmp/asq_chatter_<AR>.json
 
 ---
 
+## Template 1b: Under Review — UC Stage Not Met (Customer Onboarding — U3+)
+
+**When to use**: Support Type is Launch Accelerator, Workspace Setup, or Genie Foundation, and no linked Use Case meets U3+.
+
+**Message segments**:
+```json
+[
+  {"type": "Text", "text": "Hi "},
+  {"type": "Mention", "id": "<CREATOR_USER_ID>"},
+  {"type": "Text", "text": ", We engage in U3 or later for this service. Can you confirm the use case is at least in the evaluating stage? If yes, can you please move the use-case object to the evaluating/confirming stage? or attach the right use case to the ASQ (top right drop-down --> link use case)"}
+]
+```
+
+---
+
+## Template 1c: Under Review — UC Stage Not Met (Migrations — U2+)
+
+**When to use**: Support Type is DWH Lakebridge Migration Foundation or AI/BI Migration, and no linked Use Case is attached.
+
+**Message segments**:
+```json
+[
+  {"type": "Text", "text": "Hi "},
+  {"type": "Mention", "id": "<CREATOR_USER_ID>"},
+  {"type": "Text", "text": ", Could you please link a use case to the ASQ (top right drop-down --> link use case)? We need a use case in at least U2 (Scoping) to proceed with migration engagements."}
+]
+```
+
+---
+
 ## Template 2: Under Review — UC Stage Not Met (Launch Accelerator)
 
-**When to use**: Support Type is Launch Accelerator, and no linked Use Case meets U3+.
+**When to use**: Support Type is Launch Accelerator, and no linked Use Case meets U3+. (Legacy template — prefer Template 1b for new triage.)
 
 **Message segments**:
 ```json

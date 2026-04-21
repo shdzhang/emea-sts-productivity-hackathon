@@ -71,11 +71,15 @@ python3 $ASQ_TOOLS sfdc-query "SELECT Approval_Request__r.Name, Approval_Request
 ```
 
 Apply stage requirements from `references/triage-rules.md`:
-- **Customer Onboarding** (Launch Accelerator, Growth Accelerator for PAYG, Workspace Setup, Genie Foundation): U3+
+- **Customer Onboarding** (Launch Accelerator, Workspace Setup, Genie Foundation): U3+
 - **Migrations** (DWH Lakebridge Migration Foundation, AI/BI Migration): U2+
 - **Production Readiness** (all other Support Types — CI/CD, MLOps, Observability, Data Engineering, Data Warehousing, ML & GenAI, etc.): U4+
 
-If fail → status "Under Review", post Chatter from `references/comment-templates.md` (Template 1 or 2). **STOP.**
+If fail → status "Under Review", post Chatter from `references/comment-templates.md`:
+- **Production Readiness (U4+)** → Template 1
+- **Customer Onboarding (U3+)** → Template 1b
+- **Migrations (U2+)** → Template 1c
+**STOP.**
 
 ## Phase 3: Check Consumption & Track Fit (Launch Accelerator Only)
 
@@ -94,6 +98,8 @@ Also check for LA-to-Core and Core-to-LA conversion signals (see triage-rules.md
 > - "Need an SSA to help with Lakeflow setup" → IS in scope (creator used "SSA" generically — actual ask is Lakeflow enablement)
 >
 > **SSA Mention Rule**: When a description mentions "SSA", do NOT auto-redirect. Check the actual ask against STS services and UC stage. See `references/triage-rules.md` (SSA Mention Handling section). If in scope → assign with a note. If genuinely L400+ → Under Review + Template 6.
+>
+> **Support Type Mismatch Rule**: Always compare the description against the selected `Support_Type__c` and `Additional_Services__c`. Requestors frequently pick the wrong type (e.g., "GenAI Apps" or "AI/BI Migration" when they actually need Genie/AI/BI Data Citizen). If the description doesn't match the selected type, use the **correct** type for UC stage validation and skills matching. See `references/triage-rules.md` (Support Type Mismatch Handling section) for common mismatches and actions.
 
 ### 4a: Scope Score (1-10)
 

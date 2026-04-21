@@ -52,6 +52,10 @@ Maps the service rows in the Google Sheet to ASQ Support Types. Use this to dete
 | AI/BI Migration | PowerBI, Tableau, Other | AI/BI Data Citizen, DBSQL for Admin / Analysts |
 | DWH Lakebridge Migration Foundation | Snowflake, SQLServer, Synapse, Other | Lakebridge Analyzer, Lakebridge Converter |
 
+### Genie Foundation
+
+Genie Foundation is a Customer Onboarding service (U3+) but does not have its own row in the competency matrix Google Sheet yet. **Score Genie Foundation ASQs using the AI/BI Data Citizen row.**
+
 ## Assignment Scoring Formula
 
 **Total Score = (0.50 × Skills Match) + (0.30 × Workload Score) + (0.20 × Experience Score)**

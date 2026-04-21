@@ -20,7 +20,7 @@
 |-------|-------------|
 | `Id` | Salesforce record ID |
 | `Name` | ASQ number (e.g., AR-000115163) |
-| `Support_Type__c` | Platform Administration, Data Engineering, Data Warehousing, ML & GenAI, Launch Accelerator, Growth Accelerator for PAYG, DWH Lakebridge Migration Foundation, AI/BI Migration |
+| `Support_Type__c` | Platform Administration, Data Engineering, Data Warehousing, ML & GenAI, Growth Accelerator for PAYG (UI label: "Launch Accelerator"), DWH Lakebridge Migration Foundation, AI/BI Migration |
 | `Additional_Services__c` | Specific services requested (semicolon-separated) |
 | `Request_Description__c` | Free-text description |
 | `CreatedBy.Name` / `CreatedById` | Creator info (use `CreatedById` for Chatter @mentions) |

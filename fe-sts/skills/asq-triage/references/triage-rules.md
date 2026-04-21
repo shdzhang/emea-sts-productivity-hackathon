@@ -9,9 +9,8 @@
 
 | Category | Support Type | Minimum UC Stage |
 |----------|-------------|-----------------|
-| Customer Onboarding | Launch Accelerator (incl. "Growth Accelerator for PAYG") | U3+ |
+| Customer Onboarding | Launch Accelerator (API value: `Growth Accelerator for PAYG`) | U3+ |
 | Customer Onboarding | Workspace Setup | U3+ |
-| Customer Onboarding | Genie Foundation | U3+ |
 | Migrations | DWH Lakebridge Migration Foundation | U2+ |
 | Migrations | AI/BI Migration | U2+ |
 | Production Readiness | All other Support Types (CI/CD, MLOps, Observability, Data Engineering, Data Warehousing, ML & GenAI, etc.) | U4+ |
@@ -110,6 +109,36 @@ When an ASQ explicitly mentions SSA ("need an SSA", "SSA to help", etc.), do **N
 
 ---
 
+## Support Type / Additional Services Mismatch Handling
+
+Requestors sometimes select the wrong `Support_Type__c` or `Additional_Services__c` while the description clearly describes a different service. During Phase 4 scope scoring, **always compare the description against the selected Support Type and Additional Services**. If they don't match:
+
+1. **Identify the correct service** — use the description (SAOR content), keyword mapping, and cached service scope to determine what the actual ask maps to.
+2. **Check if the correct service changes the UC stage requirement** — e.g., if the requestor selected "AI/BI Migration" (U2+) but the description is actually Genie setup (U4+ under "Data Warehousing"), the stage threshold is different.
+3. **Decide action based on severity**:
+
+| Mismatch Type | Action |
+|---|---|
+| Wrong Support Type but same UC stage category | Assign with a note: "Description aligns with [correct service]. Scored and assigned based on actual ask." Use the correct service rows for skills matching. |
+| Wrong Support Type AND different UC stage requirement | Use the **correct** Support Type's UC stage requirement. Assign with note explaining the mismatch. |
+| Wrong Additional Services but correct Support Type | Assign using the correct service rows for skills matching. Flag in notes. |
+| Ambiguous — description could match either the selected type or another | Proceed with the selected type. No flag needed. |
+
+### Common Mismatches
+
+These are the most frequently observed mismatches:
+
+| Selected | Description Actually Asks For | Correct Type | Impact |
+|---|---|---|---|
+| **ML & GenAI / GenAI Apps** | Genie space setup, natural language SQL, AI/BI dashboards | **Data Warehousing / AI/BI Data Citizen** | UC stage same (U4+), but wrong skills match — assign to DWH-skilled person, not GenAI |
+| **AI/BI Migration** | Genie setup or AI/BI dashboard creation (not migrating from PowerBI/Tableau) | **Data Warehousing / AI/BI Data Citizen** | UC stage drops from U2+ to U4+ — may need to reject if UC < U4 |
+| **Data Warehousing** | Lakebridge migration from Snowflake/SQLServer/Synapse | **DWH Lakebridge Migration Foundation** | UC stage drops from U4+ to U2+ — may be incorrectly rejected |
+| **Platform Administration / CI/CD** | ML model deployment pipelines, model retraining automation | **ML & GenAI / MLOps** | UC stage same (U4+), but wrong skills match |
+
+> **Why this matters**: Incorrect Support Type can cause wrong UC stage validation (rejecting a valid ASQ or accepting an invalid one), wrong skills matching (assigning to someone without the right expertise), and incorrect workload categorization.
+
+---
+
 ## Keyword-to-Service Mapping (Lightweight Fallback)
 
 > Use this only if the cached service scope from the Slides deck is unavailable. The deck has richer detail on each service.
@@ -194,7 +223,7 @@ python3 $ASQ_TOOLS sfdc-query "SELECT Approval_Request__r.Name, Use_Case__r.Name
 
 | Original Issue | How to Check |
 |---------------|-------------|
-| UC stage too low | Compare current `Use_Case__r.Stages__c` against requirement (U4+, or U3+ for LA, Lakebridge, and Workspace Setup). If UC shows "Lost", flag for rejection. |
+| UC stage too low | Compare current `Use_Case__r.Stages__c` against the requirement for the ASQ's Support Type: U2+ for Migrations (Lakebridge, AI/BI Migration), U3+ for Customer Onboarding (Launch Accelerator, Workspace Setup, Genie Foundation), U4+ for all others. If UC shows "Lost", flag for rejection. |
 | No description | Check `Request_Description__c` — is it still empty/template-only? |
 | Consumption too high (LA) | Re-check consumption via logfood or Genie |
 | Out of scope | Check if `Request_Description__c` was updated with new context since the triage comment date |
