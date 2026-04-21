@@ -123,6 +123,8 @@ GROUP BY OwnerId, Owner.Name, Status__c, Support_Type__c
 ```
 
 > **Why `OwnerId` instead of `Owner.Name`**: Using IDs avoids two problems: (1) Unicode characters (e.g., š, ć, í) silently returning 0 results in `Owner.Name IN (...)` via the `sf` CLI, and (2) the need for N individual queries. A single `OwnerId IN (...)` query handles all team members reliably.
+>
+> **Aggregate result gotcha**: In GROUP BY queries, the `sf` CLI flattens `Owner.Name` to just `Name` in the result records (e.g., `r["Name"]` not `r["Owner"]["Name"]`). This is different from non-aggregate queries where relationship fields are nested objects.
 
 No `RecordType.Name` filter is needed — the OwnerId filter naturally scopes to team member ASQs.
 

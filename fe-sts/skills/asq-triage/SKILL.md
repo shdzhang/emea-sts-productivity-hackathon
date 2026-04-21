@@ -156,6 +156,8 @@ python3 $ASQ_TOOLS sfdc-query "SELECT OwnerId, Owner.Name, Status__c, Support_Ty
 ```
 
 > **Note**: Using `OwnerId` instead of `Owner.Name` is both faster (single query vs N queries) and avoids silent failures with Unicode characters (e.g., š, ć, í) in the `sf` CLI.
+>
+> **Parsing note**: In aggregate (GROUP BY) results, the `sf` CLI flattens `Owner.Name` to `Name` — access as `r["Name"]`, not `r["Owner"]["Name"]`.
 
 **Weighted workload** = `IP_regular×1 + IP_LA×2 + OH_regular×0.5 + OH_LA×1.0`
 
