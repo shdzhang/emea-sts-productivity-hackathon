@@ -38,13 +38,13 @@
 | `Use_Case_defined__c` | Boolean, unreliable. Always use the junction object instead. |
 | `Use_Case__c`, `Use_case_2__c`, `Use_case_3__c` | Lookup fields, also unreliable. Use junction. |
 
-### Support Type Aliases
+### Support Type Notes
 
-| Value in SFDC | Treat As |
-|--------------|----------|
-| `Growth Accelerator for PAYG` | Launch Accelerator |
-| `DWH Lakebridge Migration Foundation` | Data Warehousing (Lakebridge) |
-| `AI/BI Migration` | Data Warehousing (AI/BI) |
+| Value in SFDC | Notes |
+|--------------|-------|
+| `Growth Accelerator for PAYG` | UI label is "Launch Accelerator", but API value is `Growth Accelerator for PAYG`. Always use the API value in SOQL. |
+| `DWH Lakebridge Migration Foundation` | Standalone migration type. Additional Services are source platforms (Snowflake, SQLServer, Synapse). Score using Lakebridge Analyzer/Converter sheet rows. |
+| `AI/BI Migration` | Standalone migration type. Additional Services are source platforms (PowerBI, Tableau). Score using AI/BI Data Citizen and DBSQL sheet rows. |
 
 ## Approved_UseCase__c (Junction — Use Case Stages)
 

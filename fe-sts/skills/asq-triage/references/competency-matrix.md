@@ -21,8 +21,8 @@
 
 Maps the service rows in the Google Sheet to ASQ Support Types. Use this to determine which matrix rows to score for a given ASQ.
 
-| Service Row in Sheet | Support Type |
-|---------------------|-------------|
+| Service Row in Sheet | Support Type(s) |
+|---------------------|----------------|
 | Workspace Setup (Azure/AWS/GCP) | Platform Administration |
 | UC Setup - Option 1/2 | Platform Administration |
 | UC Migration | Platform Administration |
@@ -32,14 +32,25 @@ Maps the service rows in the Google Sheet to ASQ Support Types. Use this to dete
 | Lakeflow | Data Engineering |
 | Delta Optimizations & Maintenance | Data Engineering |
 | Data Sharing to External Systems | Data Engineering |
-| DBSQL for Admin / Analysts | Data Warehousing |
-| AI/BI Data Citizen | Data Warehousing |
-| Lakebridge Analyzer | Data Warehousing |
-| Lakebridge Converter | Data Warehousing |
+| DBSQL for Admin / Analysts | Data Warehousing, AI/BI Migration |
+| AI/BI Data Citizen | Data Warehousing, AI/BI Migration |
+| Lakebridge Analyzer | Data Warehousing, DWH Lakebridge Migration Foundation |
+| Lakebridge Converter | Data Warehousing, DWH Lakebridge Migration Foundation |
 | AI/ML Pipelines | ML & GenAI |
 | GenAI Apps | ML & GenAI |
 | MLOps | ML & GenAI |
-| Launch Accelerator | Launch Accelerator |
+| Launch Accelerator | Growth Accelerator for PAYG |
+
+> **"Launch Accelerator" vs "Growth Accelerator for PAYG"**: In the SFDC UI the picklist label is "Launch Accelerator", but the API value stored on records is `Growth Accelerator for PAYG`. Always use the API value in SOQL queries.
+
+### Migration Support Types
+
+**AI/BI Migration** and **DWH Lakebridge Migration Foundation** are migration-focused Support Types whose `Additional_Services__c` values specify the **source platform** being migrated from:
+
+| Support Type | Additional Services (source platforms) | Score Using Sheet Rows |
+|---|---|---|
+| AI/BI Migration | PowerBI, Tableau, Other | AI/BI Data Citizen, DBSQL for Admin / Analysts |
+| DWH Lakebridge Migration Foundation | Snowflake, SQLServer, Synapse, Other | Lakebridge Analyzer, Lakebridge Converter |
 
 ## Assignment Scoring Formula
 
