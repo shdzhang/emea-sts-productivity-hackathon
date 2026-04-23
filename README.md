@@ -312,6 +312,26 @@ fe-sts/
 
 ---
 
+## Ongoing Home
+
+Skills developed in this hackathon are being migrated to the STS team's central plugin marketplace:
+
+**[databricks-field-eng/sts-skills](https://github.com/databricks-field-eng/sts-skills)**
+
+This is the canonical, long-term home for all STS Engineering Claude Code skills. Going forward, skills will be maintained, iterated on, and promoted to the shared `sts-eng` plugin from there. Contributors should open PRs against that repo, not this one.
+
+| Skill | Status |
+|-------|--------|
+| `asq-triage` | Moved — [PR #2](https://github.com/databricks-field-eng/sts-skills/pull/2) |
+| `asq-intake` | Planned |
+| `asq-onboarding` | Planned |
+| `asq-refresher` | Planned |
+| `asq-followup` | Planned |
+| `success-story-generator` | Planned |
+| `asq-scheduler` | Planned |
+
+---
+
 ## Source
 
 - fe-sts plugin: [databricks-field-eng/vibe/plugins/fe-sts](https://github.com/databricks-field-eng/vibe/tree/main/plugins/fe-sts)
